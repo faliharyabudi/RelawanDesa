@@ -1,30 +1,30 @@
-# 🌿 RelawanDesa (Smart Village Platform)
+# RelawanDesa (Smart Village Platform)
 
 RelawanDesa adalah sistem fullstack modern berskala *Smart Village* yang dirancang untuk memfasilitasi manajemen kegiatan sosial pedesaan dan partisipasi relawan. Platform ini dibangun menggunakan arsitektur modular *Clean Architecture* dan terdiri dari tiga aplikasi utama: Backend API yang tangguh, Web Admin Panel yang elegan, dan Aplikasi Mobile yang interaktif bagi para relawan.
 
 ---
 
-## 🚀 Fitur Utama Sistem
+## Fitur Utama Sistem
 
-### 🛡️ 1. Backend API (NestJS)
+### 1. Backend API (NestJS)
 - **Role-based Authentication:** JWT Bearer authentication terenkripsi untuk Admin dan User biasa.
 - **Relasional Database Kuat:** Prisma ORM (v7) dengan MySQL yang mengatur *many-to-many relationship* antara User dan Kegiatan.
 - **RESTful Endpoints:** Layanan terstruktur untuk mengelola user, kegiatan sosial, dan pencatatan riwayat partisipasi relawan secara presisi.
 
-### 💻 2. Web Admin Panel (Next.js)
+### 2. Web Admin Panel (Next.js)
 - **Modern Glassmorphism UI:** Antarmuka responsif berbasis TailwindCSS dengan estetika *emerald-green* yang profesional.
 - **Dashboard Overview:** Analitik dan ringkasan *real-time* jumlah kegiatan, pengguna terdaftar, dan tingkat partisipasi.
 - **Full CRUD Management:** Sistem manajemen mudah untuk membuat, memperbarui, dan menghapus kegiatan sosial.
 - **Monitoring Tools:** Kemampuan memantau daftar relawan yang tergabung dalam tiap-tiap kegiatan.
 
-### 📱 3. Mobile App (React Native Expo)
+### 3. Mobile App (React Native Expo)
 - **Registrasi Mudah:** Akses cepat bagi warga desa untuk mendaftarkan diri menjadi relawan.
 - **Eksplorasi Kegiatan:** Tampilan daftar kegiatan sosial lengkap beserta jumlah relawan yang telah bergabung, tanggal, dan lokasi.
 - **Quick Join:** Sistem 1-klik yang memudahkan relawan untuk mengonfirmasi kehadiran di suatu kegiatan sosial secara *real-time*.
 
 ---
 
-## 🛠️ Tech Stack (Teknologi yang Digunakan)
+## Tech Stack (Teknologi yang Digunakan)
 
 *   **Backend:** [NestJS](https://nestjs.com/) (TypeScript), MySQL, [Prisma ORM](https://www.prisma.io/), Bcrypt, Passport JWT.
 *   **Frontend (Admin Web):** [Next.js](https://nextjs.org/) 15 (React), [TailwindCSS](https://tailwindcss.com/) terintegrasi via global CSS, Axios.
@@ -33,7 +33,7 @@ RelawanDesa adalah sistem fullstack modern berskala *Smart Village* yang diranca
 
 ---
 
-## ⚙️ Cara Menjalankan Proyek Secara Lokal
+## Cara Menjalankan Proyek Secara Lokal
 
 Proyek ini telah dikonfigurasi sedemikian rupa agar mudah dijalankan secara independen. Ikuti langkah-langkah di bawah ini:
 
@@ -86,5 +86,5 @@ Proyek ini telah dikonfigurasi sedemikian rupa agar mudah dijalankan secara inde
 
 ---
 
-## 📜 Lisensi & Penafian
+## Lisensi & Penafian
 Proyek ini dibuat sebagai prototipe infrastruktur perangkat lunak *Smart Village* modern dan dapat diadaptasi bebas untuk kebutuhan desa-desa di seluruh Indonesia.
