@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../lib/api';
 
@@ -11,7 +11,7 @@ export default function LoginScreen({ navigation }: any) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Email dan password harus diisi');
+      Alert.alert('Perhatian', 'Mohon lengkapi email dan password Anda.');
       return;
     }
 
@@ -20,157 +20,177 @@ export default function LoginScreen({ navigation }: any) {
       const response = await api.post('/api/auth/login', { email, password });
       await login(response.data.access_token, response.data.user);
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Email atau password salah';
-      Alert.alert('Login Gagal', message);
+      if (error.message === 'Network Error' || !error.response) {
+        Alert.alert('Koneksi Gagal', 'Tidak dapat terhubung ke server. Pastikan Backend NestJS sedang berjalan.');
+      } else {
+        const message = error.response?.data?.message || 'Email atau password salah';
+        Alert.alert('Login Gagal', message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>🌿</Text>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Text style={styles.logoText}>🍃</Text>
+          </View>
+          <Text style={styles.title}>Selamat Datang</Text>
+          <Text style={styles.subtitle}>Masuk ke portal RelawanDesa Anda</Text>
         </View>
-        <Text style={styles.title}>RelawanDesa</Text>
-        <Text style={styles.subtitle}>Sistem Smart Village</Text>
-      </View>
 
-      <View style={styles.form}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="relawan@desa.id"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
+        <View style={styles.form}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Alamat Email</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="email@contoh.com"
+                placeholderTextColor="#94a3b8"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
+              />
+            </View>
+          </View>
 
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="••••••••"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Kata Sandi</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="••••••••"
+                placeholderTextColor="#94a3b8"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+            </View>
+          </View>
 
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Masuk</Text>
-          )}
-        </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={handleLogin}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Masuk Sekarang</Text>
+            )}
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity 
-          style={styles.registerLink}
-          onPress={() => navigation.navigate('Register')}
-        >
-          <Text style={styles.registerText}>Belum punya akun? <Text style={styles.registerTextBold}>Daftar Relawan</Text></Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+        <View style={styles.footer}>
+          <Text style={styles.registerText}>Belum bergabung dengan kami? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.registerTextBold}>Daftar Relawan</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#ffffff',
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     padding: 24,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 48,
+    marginBottom: 40,
   },
   logoContainer: {
-    width: 64,
-    height: 64,
-    backgroundColor: '#10b981',
-    borderRadius: 16,
+    width: 80,
+    height: 80,
+    backgroundColor: '#ecfdf5',
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    marginBottom: 20,
   },
   logoText: {
-    fontSize: 32,
+    fontSize: 40,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: '#0f172a',
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748b',
-    marginTop: 4,
+    marginTop: 6,
   },
   form: {
-    backgroundColor: '#ffffff',
-    padding: 24,
-    borderRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 15,
-    elevation: 2,
+    width: '100%',
+  },
+  inputGroup: {
+    marginBottom: 20,
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#334155',
+    color: '#1e293b',
     marginBottom: 8,
+    marginLeft: 4,
   },
-  input: {
+  inputContainer: {
     backgroundColor: '#f8fafc',
     borderWidth: 1,
     borderColor: '#e2e8f0',
-    borderRadius: 12,
-    padding: 14,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  input: {
+    padding: 16,
     fontSize: 16,
     color: '#0f172a',
-    marginBottom: 20,
   },
   button: {
     backgroundColor: '#10b981',
-    padding: 16,
-    borderRadius: 12,
+    padding: 18,
+    borderRadius: 16,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 12,
     shadowColor: '#10b981',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 6,
   },
   buttonText: {
     color: '#ffffff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
-  registerLink: {
-    marginTop: 24,
-    alignItems: 'center',
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 32,
   },
   registerText: {
     color: '#64748b',
-    fontSize: 14,
+    fontSize: 15,
   },
   registerTextBold: {
     color: '#10b981',
-    fontWeight: 'bold',
+    fontWeight: '700',
+    fontSize: 15,
   },
 });
