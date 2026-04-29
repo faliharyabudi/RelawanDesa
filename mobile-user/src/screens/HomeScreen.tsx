@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl, Image } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../lib/api';
 import { Activity } from '../types';
 
 export default function HomeScreen({ navigation }: any) {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -35,17 +35,26 @@ export default function HomeScreen({ navigation }: any) {
     <TouchableOpacity 
       style={styles.card}
       onPress={() => navigation.navigate('ActivityDetail', { activity: item })}
+      activeOpacity={0.8}
     >
       <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
+        <View style={styles.cardTitleContainer}>
+          <Text style={styles.cardTitle}>{item.title}</Text>
+        </View>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{item._count?.volunteers || 0} Relawan</Text>
         </View>
       </View>
       <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
       <View style={styles.cardFooter}>
-        <Text style={styles.cardInfo}>📍 {item.location}</Text>
-        <Text style={styles.cardInfo}>📅 {new Date(item.date).toLocaleDateString('id-ID')}</Text>
+        <View style={styles.infoRow}>
+          <Text style={styles.iconText}>📍</Text>
+          <Text style={styles.cardInfo}>{item.location}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.iconText}>📅</Text>
+          <Text style={styles.cardInfo}>{new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -53,17 +62,25 @@ export default function HomeScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Halo, {user?.name} 👋</Text>
-          <Text style={styles.subtitle}>Ayo ikut berkontribusi hari ini!</Text>
+        <View style={styles.headerContent}>
+          <Text style={styles.greeting}>Halo, {user?.name?.split(' ')[0]} 👋</Text>
+          <Text style={styles.subtitle}>Mari buat perubahan hari ini!</Text>
         </View>
-        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-          <Text style={styles.logoutText}>Keluar</Text>
-        </TouchableOpacity>
+        <View style={styles.avatarMini}>
+          <Text style={styles.avatarMiniText}>{user?.name?.charAt(0).toUpperCase()}</Text>
+        </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Kegiatan Sosial Tersedia</Text>
+      <View style={styles.bannerContainer}>
+        <View style={styles.banner}>
+          <Text style={styles.bannerTitle}>Jadi Relawan Sekarang!</Text>
+          <Text style={styles.bannerDesc}>Temukan kegiatan sosial yang sesuai dengan Anda dan berikan dampak positif bagi desa.</Text>
+        </View>
+      </View>
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Kegiatan Tersedia</Text>
+        <Text style={styles.sectionSubtitle}>Pilih dan daftarkan diri Anda</Text>
       </View>
 
       {loading ? (
@@ -81,7 +98,9 @@ export default function HomeScreen({ navigation }: any) {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#10b981']} />
           }
           ListEmptyComponent={
-            <Text style={styles.emptyText}>Belum ada kegiatan sosial saat ini.</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Belum ada kegiatan sosial saat ini.</Text>
+            </View>
           }
         />
       )}
@@ -98,6 +117,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#10b981',
     padding: 24,
     paddingTop: 60,
+    paddingBottom: 40,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
     flexDirection: 'row',
@@ -109,50 +129,93 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
+  headerContent: {
+    flex: 1,
+  },
   greeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '800',
     color: '#ffffff',
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#d1fae5',
     marginTop: 4,
+    fontWeight: '500',
   },
-  logoutButton: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
+  avatarMini: {
+    width: 48,
+    height: 48,
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  logoutText: {
+  avatarMiniText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#10b981',
+  },
+  bannerContainer: {
+    paddingHorizontal: 24,
+    marginTop: -25,
+    marginBottom: 10,
+  },
+  banner: {
+    backgroundColor: '#0f172a',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  bannerTitle: {
     color: '#ffffff',
-    fontWeight: '600',
-    fontSize: 12,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 6,
   },
-  section: {
-    padding: 24,
-    paddingBottom: 12,
+  bannerDesc: {
+    color: '#94a3b8',
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  sectionHeader: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#0f172a',
   },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#64748b',
+    marginTop: 2,
+  },
   list: {
     padding: 24,
-    paddingTop: 0,
+    paddingTop: 8,
   },
   card: {
     backgroundColor: '#ffffff',
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    marginBottom: 20,
+    shadowColor: '#64748b',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
     borderWidth: 1,
     borderColor: '#f1f5f9',
   },
@@ -160,53 +223,67 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 12,
+  },
+  cardTitleContainer: {
+    flex: 1,
+    marginRight: 12,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#1e293b',
-    flex: 1,
-    marginRight: 12,
+    lineHeight: 24,
   },
   badge: {
     backgroundColor: '#ecfdf5',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
   badgeText: {
     color: '#059669',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   cardDesc: {
     fontSize: 14,
     color: '#64748b',
     marginBottom: 16,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-    paddingTop: 12,
+    borderTopColor: '#f8fafc',
+    paddingTop: 16,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconText: {
+    fontSize: 14,
+    marginRight: 6,
   },
   cardInfo: {
     fontSize: 13,
     color: '#475569',
-    fontWeight: '500',
+    fontWeight: '600',
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  emptyContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
   emptyText: {
-    textAlign: 'center',
     color: '#94a3b8',
-    marginTop: 40,
+    fontSize: 15,
   },
 });
