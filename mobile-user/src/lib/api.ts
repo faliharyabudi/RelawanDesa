@@ -2,8 +2,8 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-// Ganti URL ini dengan IP lokal komputer Anda jika menggunakan device sungguhan
-const API_URL = Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+// Menggunakan IP lokal komputer agar bisa diakses dari HP fisik (Expo Go) maupun emulator
+const API_URL = 'http://192.168.100.12:3000';
 
 const api = axios.create({
   baseURL: API_URL,
