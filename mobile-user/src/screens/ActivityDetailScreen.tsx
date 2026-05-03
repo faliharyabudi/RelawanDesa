@@ -6,9 +6,12 @@ import {
 import api, { API_URL } from '../lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ActivityDetailScreen({ route, navigation }: any) {
   const { activity } = route.params;
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [isJoined, setIsJoined] = useState(false);
@@ -86,6 +89,34 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
               Alert.alert('Berhasil', 'Pendaftaran Anda telah dibatalkan.');
             } catch (error: any) {
               const message = error.response?.data?.message || 'Gagal membatalkan pendaftaran.';
+              Alert.alert('Error', message);
+            } finally {
+              setLoading(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      '🗑️ Hapus Kegiatan',
+      `Anda yakin ingin menghapus kegiatan:\n\n"${activity.title}"?\n\nTindakan ini tidak dapat dibatalkan.`,
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Ya, Hapus',
+          style: 'destructive',
+          onPress: async () => {
+            setLoading(true);
+            try {
+              await api.delete(`/api/activities/${activity.id}`);
+              Alert.alert('Berhasil', 'Kegiatan berhasil dihapus.', [
+                { text: 'Oke', onPress: () => navigation.goBack() }
+              ]);
+            } catch (error: any) {
+              const message = error.response?.data?.message || 'Gagal menghapus kegiatan.';
               Alert.alert('Error', message);
             } finally {
               setLoading(false);
@@ -247,27 +278,48 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
 
       {/* CTA Button */}
       <View style={styles.footerOverlay}>
-        {checkingStatus ? (
-          <View style={styles.loadingBtn}>
-            <ActivityIndicator color="#10b981" />
-            <Text style={styles.loadingBtnText}>Memeriksa status...</Text>
-          </View>
-        ) : isJoined ? (
-          <TouchableOpacity onPress={handleUnjoin} disabled={loading} activeOpacity={0.85}>
-            <View style={styles.unjoinButton}>
-              {loading ? (
-                <ActivityIndicator color="#ef4444" />
-              ) : (
-                <>
-                  <Ionicons name="close-circle" size={20} color="#ef4444" style={{marginRight: 8}} />
-                  <Text style={styles.unjoinButtonText}>Batalkan Pendaftaran</Text>
-                </>
-              )}
-            </View>
+        {/* Tombol Hapus untuk Admin */}
+        {isAdmin && (
+          <TouchableOpacity
+            onPress={handleDelete}
+            disabled={loading}
+            activeOpacity={0.85}
+            style={styles.deleteButton}
+          >
+            {loading ? (
+              <ActivityIndicator color="#ef4444" />
+            ) : (
+              <>
+                <Ionicons name="trash" size={18} color="#ef4444" style={{ marginRight: 6 }} />
+                <Text style={styles.deleteButtonText}>Hapus Kegiatan</Text>
+              </>
+            )}
           </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={handleJoin} disabled={loading} activeOpacity={0.85}>
-            <LinearGradient colors={['#10b981', '#059669']} style={styles.joinButton}>
+        )}
+
+        {/* Tombol Daftar/Batal untuk User biasa */}
+        {!isAdmin && (
+          checkingStatus ? (
+            <View style={styles.loadingBtn}>
+              <ActivityIndicator color="#10b981" />
+              <Text style={styles.loadingBtnText}>Memeriksa status...</Text>
+            </View>
+          ) : isJoined ? (
+            <TouchableOpacity onPress={handleUnjoin} disabled={loading} activeOpacity={0.85}>
+              <View style={styles.unjoinButton}>
+                {loading ? (
+                  <ActivityIndicator color="#ef4444" />
+                ) : (
+                  <>
+                    <Ionicons name="close-circle" size={20} color="#ef4444" style={{marginRight: 8}} />
+                    <Text style={styles.unjoinButtonText}>Batalkan Pendaftaran</Text>
+                  </>
+                )}
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={handleJoin} disabled={loading} activeOpacity={0.85}>
+              <LinearGradient colors={['#10b981', '#059669']} style={styles.joinButton}>
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
@@ -483,5 +535,20 @@ const styles = StyleSheet.create({
   loadingBtnText: {
     color: '#64748b',
     fontWeight: '600',
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 20,
+    backgroundColor: '#fee2e2',
+    borderWidth: 1.5,
+    borderColor: '#fca5a5',
+  },
+  deleteButtonText: {
+    color: '#ef4444',
+    fontSize: 15,
+    fontWeight: '700',
   },
 });
