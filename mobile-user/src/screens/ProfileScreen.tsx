@@ -1,10 +1,39 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import api from '../lib/api';
+
+interface ProfileData {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  _count?: { volunteers: number };
+}
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get<ProfileData>('/api/users/me');
+        setProfile(response.data);
+      } catch (error) {
+        // Fallback ke data dari local storage jika gagal
+        if (user) {
+          setProfile({ ...user, _count: { volunteers: 0 } });
+        }
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleLogout = () => {
     Alert.alert(
@@ -17,29 +46,56 @@ export default function ProfileScreen() {
     );
   };
 
+  const displayData = profile || user;
+
   const menuItems = [
-    { icon: '👤', label: 'Nama Lengkap', value: user?.name || '-' },
-    { icon: '📧', label: 'Alamat Email', value: user?.email || '-' },
-    { icon: '🎖️', label: 'Peran Akun', value: user?.role === 'ADMIN' ? 'Administrator' : 'Relawan Desa' },
+    { icon: '👤', label: 'Nama Lengkap', value: displayData?.name || '-' },
+    { icon: '📧', label: 'Alamat Email', value: (displayData as any)?.email || '-' },
+    {
+      icon: '🎖️', label: 'Peran Akun',
+      value: displayData?.role === 'ADMIN' ? 'Administrator' : 'Relawan Desa'
+    },
+    {
+      icon: '📅', label: 'Bergabung Sejak',
+      value: displayData?.createdAt
+        ? new Date(displayData.createdAt).toLocaleDateString('id-ID', {
+            day: 'numeric', month: 'long', year: 'numeric'
+          })
+        : '-'
+    },
   ];
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <LinearGradient colors={['#059669', '#10b981']} style={styles.header}>
-        <View style={styles.avatarContainer}>
-          <LinearGradient colors={['#ffffff', '#f0fdf4']} style={styles.avatarGrad}>
-            <Text style={styles.avatarText}>
-              {user?.name?.charAt(0).toUpperCase() || 'R'}
-            </Text>
-          </LinearGradient>
-        </View>
-        <Text style={styles.name}>{user?.name}</Text>
-        <View style={styles.roleBadge}>
-          <Text style={styles.roleBadgeText}>
-            {user?.role === 'ADMIN' ? '⭐ Administrator' : '🤝 Relawan Desa'}
-          </Text>
-        </View>
+        {loadingProfile ? (
+          <View style={styles.loadingHeader}>
+            <ActivityIndicator color="#ffffff" size="large" />
+          </View>
+        ) : (
+          <>
+            <LinearGradient colors={['#ffffff', '#f0fdf4']} style={styles.avatarGrad}>
+              <Text style={styles.avatarText}>
+                {displayData?.name?.charAt(0).toUpperCase() || 'R'}
+              </Text>
+            </LinearGradient>
+            <Text style={styles.name}>{displayData?.name}</Text>
+            <View style={styles.roleBadge}>
+              <Text style={styles.roleBadgeText}>
+                {displayData?.role === 'ADMIN' ? '⭐ Administrator' : '🤝 Relawan Desa'}
+              </Text>
+            </View>
+
+            {/* Stat kegiatan diikuti */}
+            <View style={styles.statRow}>
+              <View style={styles.statBox}>
+                <Text style={styles.statNum}>{profile?._count?.volunteers || 0}</Text>
+                <Text style={styles.statLabel}>Kegiatan Diikuti</Text>
+              </View>
+            </View>
+          </>
+        )}
       </LinearGradient>
 
       {/* Info Section */}
@@ -111,13 +167,10 @@ const styles = StyleSheet.create({
     elevation: 10,
     marginBottom: 8,
   },
-  avatarContainer: {
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
+  loadingHeader: {
+    height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   avatarGrad: {
     width: 100,
@@ -125,6 +178,12 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
   },
   avatarText: {
     fontSize: 44,
@@ -143,23 +202,45 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
+    marginBottom: 16,
   },
   roleBadgeText: {
     fontSize: 14,
     color: '#ffffff',
     fontWeight: '600',
   },
+  statRow: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 16,
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+  },
+  statBox: {
+    alignItems: 'center',
+  },
+  statNum: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#ffffff',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#d1fae5',
+    fontWeight: '600',
+    marginTop: 2,
+  },
   section: {
     paddingHorizontal: 20,
     paddingTop: 24,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '800',
-    color: '#0f172a',
+    color: '#64748b',
     marginBottom: 12,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
   },
   infoCard: {
     backgroundColor: '#ffffff',
@@ -187,14 +268,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 16,
   },
-  infoIcon: {
-    fontSize: 20,
-  },
-  infoContent: {
-    flex: 1,
-  },
+  infoIcon: { fontSize: 20 },
+  infoContent: { flex: 1 },
   infoLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#64748b',
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -202,7 +279,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   infoValue: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#0f172a',
     fontWeight: '700',
   },
@@ -224,16 +301,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d1fae5',
   },
-  aboutEmoji: {
-    fontSize: 40,
-    marginBottom: 8,
-  },
-  aboutName: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#059669',
-    marginBottom: 8,
-  },
+  aboutEmoji: { fontSize: 40, marginBottom: 8 },
+  aboutName: { fontSize: 20, fontWeight: '800', color: '#059669', marginBottom: 8 },
   aboutDesc: {
     fontSize: 14,
     color: '#64748b',
@@ -247,11 +316,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
-  versionText: {
-    fontSize: 12,
-    color: '#059669',
-    fontWeight: '700',
-  },
+  versionText: { fontSize: 12, color: '#059669', fontWeight: '700' },
   logoutButton: {
     padding: 18,
     borderRadius: 20,
@@ -265,9 +330,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 6,
   },
-  logoutIcon: {
-    fontSize: 20,
-  },
+  logoutIcon: { fontSize: 20 },
   logoutButtonText: {
     color: '#ffffff',
     fontSize: 17,
