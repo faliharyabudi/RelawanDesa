@@ -31,16 +31,17 @@ export class UsersController {
   @Get('me')
   getMe(@CurrentUser('userId') userId: string) {
     return this.usersService.getMe(userId);
+  }
+
   // User: update profil sendiri
   @Put('me/profile')
   updateMyProfile(
     @CurrentUser('userId') userId: string,
-    @Body('name') name?: string,
-    @Body('avatarUrl') avatarUrl?: string,
+    @Body() body: { name?: string; avatarUrl?: string },
   ) {
     const data: any = {};
-    if (name !== undefined) data.name = name;
-    if (avatarUrl !== undefined) data.avatarUrl = avatarUrl;
+    if (body.name !== undefined) data.name = body.name;
+    if (body.avatarUrl !== undefined) data.avatarUrl = body.avatarUrl;
     return this.usersService.update(userId, data);
   }
 
