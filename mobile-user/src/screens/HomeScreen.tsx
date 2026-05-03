@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl, Image } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View, Text, FlatList, TouchableOpacity, StyleSheet,
+  ActivityIndicator, RefreshControl, Animated
+} from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../lib/api';
 import { Activity } from '../types';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function HomeScreen({ navigation }: any) {
   const { user } = useAuth();
@@ -10,10 +14,17 @@ export default function HomeScreen({ navigation }: any) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
   const fetchActivities = async () => {
     try {
       const response = await api.get<Activity[]>('/api/activities');
       setActivities(response.data);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }).start();
     } catch (error) {
       console.error('Failed to fetch activities', error);
     } finally {
@@ -31,52 +42,83 @@ export default function HomeScreen({ navigation }: any) {
     fetchActivities();
   };
 
-  const renderItem = ({ item }: { item: Activity }) => (
-    <TouchableOpacity 
-      style={styles.card}
-      onPress={() => navigation.navigate('ActivityDetail', { activity: item })}
-      activeOpacity={0.8}
-    >
-      <View style={styles.cardHeader}>
-        <View style={styles.cardTitleContainer}>
-          <Text style={styles.cardTitle}>{item.title}</Text>
-        </View>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{item._count?.volunteers || 0} Relawan</Text>
-        </View>
-      </View>
-      <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
-      <View style={styles.cardFooter}>
-        <View style={styles.infoRow}>
-          <Text style={styles.iconText}>📍</Text>
-          <Text style={styles.cardInfo}>{item.location}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.iconText}>📅</Text>
-          <Text style={styles.cardInfo}>{new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+  const renderItem = ({ item, index }: { item: Activity; index: number }) => (
+    <Animated.View style={{ opacity: fadeAnim }}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => navigation.navigate('ActivityDetail', { activity: item })}
+        activeOpacity={0.85}
+      >
+        <LinearGradient
+          colors={['#ecfdf5', '#ffffff']}
+          style={styles.cardGradient}
+        >
+          <View style={styles.cardHeader}>
+            <View style={styles.cardTitleContainer}>
+              <Text style={styles.cardTitle}>{item.title}</Text>
+            </View>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>👥 {item._count?.volunteers || 0}</Text>
+            </View>
+          </View>
+          <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
+          <View style={styles.cardFooter}>
+            <View style={styles.infoRow}>
+              <View style={styles.infoChip}>
+                <Text style={styles.iconText}>📍</Text>
+                <Text style={styles.cardInfo}>{item.location}</Text>
+              </View>
+              <View style={styles.infoChip}>
+                <Text style={styles.iconText}>📅</Text>
+                <Text style={styles.cardInfo}>
+                  {new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </Text>
+              </View>
+            </View>
+            <LinearGradient colors={['#10b981', '#059669']} style={styles.arrowBtn}>
+              <Text style={styles.arrowText}>→</Text>
+            </LinearGradient>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* Header */}
+      <LinearGradient colors={['#059669', '#10b981']} style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={styles.greeting}>Halo, {user?.name?.split(' ')[0]} 👋</Text>
-          <Text style={styles.subtitle}>Mari buat perubahan hari ini!</Text>
+          <View>
+            <Text style={styles.greetingSmall}>Halo,</Text>
+            <Text style={styles.greeting}>{user?.name?.split(' ')[0]} 👋</Text>
+            <Text style={styles.subtitle}>Mari buat perubahan hari ini!</Text>
+          </View>
+          <View style={styles.avatarMini}>
+            <Text style={styles.avatarMiniText}>{user?.name?.charAt(0).toUpperCase()}</Text>
+          </View>
         </View>
-        <View style={styles.avatarMini}>
-          <Text style={styles.avatarMiniText}>{user?.name?.charAt(0).toUpperCase()}</Text>
-        </View>
-      </View>
 
-      <View style={styles.bannerContainer}>
-        <View style={styles.banner}>
-          <Text style={styles.bannerTitle}>Jadi Relawan Sekarang!</Text>
-          <Text style={styles.bannerDesc}>Temukan kegiatan sosial yang sesuai dengan Anda dan berikan dampak positif bagi desa.</Text>
+        {/* Stat Banner */}
+        <View style={styles.statRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statNum}>{activities.length}</Text>
+            <Text style={styles.statLabel}>Kegiatan</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statNum}>
+              {activities.reduce((sum, a) => sum + (a._count?.volunteers || 0), 0)}
+            </Text>
+            <Text style={styles.statLabel}>Relawan</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statNum}>{user?.role === 'ADMIN' ? 'Admin' : 'User'}</Text>
+            <Text style={styles.statLabel}>Peran Anda</Text>
+          </View>
         </View>
-      </View>
+      </LinearGradient>
 
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Kegiatan Tersedia</Text>
@@ -86,6 +128,7 @@ export default function HomeScreen({ navigation }: any) {
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#10b981" />
+          <Text style={styles.loadingText}>Memuat kegiatan...</Text>
         </View>
       ) : (
         <FlatList
@@ -99,7 +142,9 @@ export default function HomeScreen({ navigation }: any) {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Belum ada kegiatan sosial saat ini.</Text>
+              <Text style={styles.emptyEmoji}>🌾</Text>
+              <Text style={styles.emptyTitle}>Belum Ada Kegiatan</Text>
+              <Text style={styles.emptyText}>Belum ada kegiatan sosial yang tersedia saat ini. Coba lagi nanti.</Text>
             </View>
           }
         />
@@ -111,91 +156,98 @@ export default function HomeScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#f0fdf4',
   },
   header: {
-    backgroundColor: '#10b981',
-    padding: 24,
+    paddingHorizontal: 24,
     paddingTop: 60,
-    paddingBottom: 40,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    paddingBottom: 24,
+    borderBottomLeftRadius: 36,
+    borderBottomRightRadius: 36,
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 10,
   },
   headerContent: {
-    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+  },
+  greetingSmall: {
+    fontSize: 14,
+    color: '#d1fae5',
+    fontWeight: '500',
   },
   greeting: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '800',
     color: '#ffffff',
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 15,
-    color: '#d1fae5',
+    fontSize: 14,
+    color: '#a7f3d0',
     marginTop: 4,
     fontWeight: '500',
   },
   avatarMini: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 52,
     backgroundColor: '#ffffff',
-    borderRadius: 24,
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
   },
   avatarMiniText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#10b981',
+    color: '#059669',
   },
-  bannerContainer: {
-    paddingHorizontal: 24,
-    marginTop: -25,
-    marginBottom: 10,
-  },
-  banner: {
-    backgroundColor: '#0f172a',
+  statRow: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: 20,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'space-around',
   },
-  bannerTitle: {
+  statBox: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statNum: {
+    fontSize: 22,
+    fontWeight: '800',
     color: '#ffffff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 6,
   },
-  bannerDesc: {
-    color: '#94a3b8',
-    fontSize: 13,
-    lineHeight: 20,
+  statLabel: {
+    fontSize: 12,
+    color: '#d1fae5',
+    marginTop: 2,
+    fontWeight: '500',
+  },
+  statDivider: {
+    width: 1,
+    height: 36,
+    backgroundColor: 'rgba(255,255,255,0.3)',
   },
   sectionHeader: {
     paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingVertical: 20,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '800',
     color: '#0f172a',
+    letterSpacing: -0.3,
   },
   sectionSubtitle: {
     fontSize: 14,
@@ -203,27 +255,29 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   list: {
-    padding: 24,
-    paddingTop: 8,
+    paddingHorizontal: 20,
+    paddingBottom: 24,
   },
   card: {
-    backgroundColor: '#ffffff',
     borderRadius: 24,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#64748b',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
+    marginBottom: 16,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
     elevation: 4,
+    overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: '#d1fae5',
+  },
+  cardGradient: {
+    padding: 20,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   cardTitleContainer: {
     flex: 1,
@@ -231,24 +285,24 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
+    fontWeight: '800',
+    color: '#064e3b',
     lineHeight: 24,
   },
   badge: {
-    backgroundColor: '#ecfdf5',
+    backgroundColor: '#059669',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   badgeText: {
-    color: '#059669',
+    color: '#ffffff',
     fontSize: 12,
     fontWeight: '700',
   },
   cardDesc: {
     fontSize: 14,
-    color: '#64748b',
+    color: '#475569',
     marginBottom: 16,
     lineHeight: 22,
   },
@@ -257,33 +311,67 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderTopWidth: 1,
-    borderTopColor: '#f8fafc',
-    paddingTop: 16,
+    borderTopColor: '#d1fae5',
+    paddingTop: 14,
   },
   infoRow: {
+    flex: 1,
+    gap: 6,
+  },
+  infoChip: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
   iconText: {
-    fontSize: 14,
-    marginRight: 6,
+    fontSize: 13,
   },
   cardInfo: {
     fontSize: 13,
     color: '#475569',
     fontWeight: '600',
   },
+  arrowBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  arrowText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 12,
+  },
+  loadingText: {
+    color: '#64748b',
+    fontSize: 14,
   },
   emptyContainer: {
-    paddingVertical: 40,
+    paddingVertical: 60,
     alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  emptyEmoji: {
+    fontSize: 56,
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#0f172a',
+    marginBottom: 8,
   },
   emptyText: {
     color: '#94a3b8',
-    fontSize: 15,
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
