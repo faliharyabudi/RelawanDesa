@@ -1,24 +1,43 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Animated } from 'react-native';
 import api from '../lib/api';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function RegisterScreen({ navigation }: any) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      })
+    ]).start();
+  }, []);
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
-      Alert.alert('Error', 'Semua kolom harus diisi');
+      Alert.alert('Perhatian', 'Semua kolom harus diisi.');
       return;
     }
 
     setLoading(true);
     try {
       await api.post('/api/auth/register', { name, email, password });
-      Alert.alert('Sukses', 'Registrasi berhasil! Silakan login.', [
-        { text: 'OK', onPress: () => navigation.navigate('Login') }
+      Alert.alert('Sukses 🎉', 'Registrasi berhasil! Silakan login untuk melanjutkan.', [
+        { text: 'Masuk Sekarang', onPress: () => navigation.navigate('Login') }
       ]);
     } catch (error: any) {
       if (error.message === 'Network Error' || !error.response) {
@@ -33,136 +52,189 @@ export default function RegisterScreen({ navigation }: any) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Daftar Relawan</Text>
-        <Text style={styles.subtitle}>Mari bergabung membangun desa kita</Text>
-      </View>
+    <LinearGradient colors={['#ffffff', '#f0fdf4']} style={styles.container}>
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+            <LinearGradient colors={['#34d399', '#059669']} style={styles.logoContainer}>
+              <Text style={styles.logoText}>🤝</Text>
+            </LinearGradient>
+            <Text style={styles.title}>Daftar Relawan</Text>
+            <Text style={styles.subtitle}>Mari bergabung membangun desa kita</Text>
+          </Animated.View>
 
-      <View style={styles.form}>
-        <Text style={styles.label}>Nama Lengkap</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Budi Santoso"
-          value={name}
-          onChangeText={setName}
-        />
+          <Animated.View style={[styles.form, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Nama Lengkap</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Budi Santoso"
+                  placeholderTextColor="#94a3b8"
+                  value={name}
+                  onChangeText={setName}
+                />
+              </View>
+            </View>
 
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="budi@desa.id"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Alamat Email</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="budi@desa.id"
+                  placeholderTextColor="#94a3b8"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+            </View>
 
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Min. 6 karakter"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Kata Sandi</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Min. 6 karakter"
+                  placeholderTextColor="#94a3b8"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </View>
+            </View>
 
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={handleRegister}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Daftar Sekarang</Text>
-          )}
-        </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={handleRegister}
+              disabled={loading}
+              activeOpacity={0.8}
+            >
+              <LinearGradient colors={['#10b981', '#059669']} style={styles.button}>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>Daftar Sekarang</Text>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.loginLink}
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.loginText}>Sudah punya akun? <Text style={styles.loginTextBold}>Masuk</Text></Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+            <TouchableOpacity 
+              style={styles.loginLink}
+              onPress={() => navigation.navigate('Login')}
+            >
+              <Text style={styles.loginText}>Sudah punya akun? <Text style={styles.loginTextBold}>Masuk</Text></Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  scrollContent: {
     flexGrow: 1,
-    backgroundColor: '#f1f5f9',
     justifyContent: 'center',
-    padding: 24,
+    padding: 28,
   },
   header: {
+    alignItems: 'center',
     marginBottom: 40,
   },
+  logoContainer: {
+    width: 88,
+    height: 88,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  logoText: {
+    fontSize: 44,
+  },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontWeight: '800',
     color: '#0f172a',
-    marginBottom: 8,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 16,
     color: '#64748b',
+    marginTop: 8,
+    fontWeight: '500',
   },
   form: {
-    backgroundColor: '#ffffff',
-    padding: 24,
-    borderRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 15,
-    elevation: 2,
+    width: '100%',
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#334155',
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: '#f8fafc',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 12,
-    padding: 14,
-    fontSize: 16,
-    color: '#0f172a',
+  inputGroup: {
     marginBottom: 20,
   },
+  label: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#334155',
+    marginBottom: 10,
+    marginLeft: 4,
+  },
+  inputContainer: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1.5,
+    borderColor: '#e2e8f0',
+    borderRadius: 18,
+    overflow: 'hidden',
+    shadowColor: '#94a3b8',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  input: {
+    padding: 18,
+    fontSize: 16,
+    color: '#0f172a',
+  },
   button: {
-    backgroundColor: '#10b981',
-    padding: 16,
-    borderRadius: 12,
+    padding: 20,
+    borderRadius: 20,
     alignItems: 'center',
-    marginTop: 8,
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    marginTop: 16,
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 8,
   },
   buttonText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   loginLink: {
-    marginTop: 24,
+    marginTop: 32,
     alignItems: 'center',
   },
   loginText: {
     color: '#64748b',
-    fontSize: 14,
+    fontSize: 15,
   },
   loginTextBold: {
     color: '#10b981',
     fontWeight: 'bold',
+    fontSize: 15,
   },
 });
