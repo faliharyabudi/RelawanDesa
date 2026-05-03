@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
   ActivityIndicator, Alert
@@ -9,6 +9,26 @@ import { LinearGradient } from 'expo-linear-gradient';
 export default function ActivityDetailScreen({ route, navigation }: any) {
   const { activity } = route.params;
   const [loading, setLoading] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(true);
+  const [isJoined, setIsJoined] = useState(false);
+  const [volunteerCount, setVolunteerCount] = useState<number>(activity._count?.volunteers || 0);
+
+  // Cek apakah user sudah join kegiatan ini
+  useEffect(() => {
+    const checkJoinStatus = async () => {
+      try {
+        const response = await api.get('/api/users/me/activities');
+        const myActivities: any[] = response.data;
+        const alreadyJoined = myActivities.some(a => a.activityId === activity.id);
+        setIsJoined(alreadyJoined);
+      } catch (error) {
+        // Jika gagal cek, asumsikan belum join
+      } finally {
+        setCheckingStatus(false);
+      }
+    };
+    checkJoinStatus();
+  }, []);
 
   const handleJoin = async () => {
     Alert.alert(
@@ -22,12 +42,42 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
             setLoading(true);
             try {
               await api.post(`/api/activities/${activity.id}/join`);
+              setIsJoined(true);
+              setVolunteerCount(prev => prev + 1);
               Alert.alert('Berhasil! 🎉', 'Terima kasih atas kepedulian Anda. Anda telah resmi terdaftar sebagai relawan.', [
-                { text: 'Tutup', onPress: () => navigation.goBack() }
+                { text: 'Oke' }
               ]);
             } catch (error: any) {
-              const message = error.response?.data?.message || 'Gagal mendaftar. Anda mungkin sudah terdaftar.';
+              const message = error.response?.data?.message || 'Gagal mendaftar.';
               Alert.alert('Informasi', message);
+            } finally {
+              setLoading(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleUnjoin = async () => {
+    Alert.alert(
+      'Batalkan Partisipasi',
+      `Anda yakin ingin membatalkan pendaftaran dari:\n\n"${activity.title}"?`,
+      [
+        { text: 'Tidak', style: 'cancel' },
+        {
+          text: 'Ya, Batalkan',
+          style: 'destructive',
+          onPress: async () => {
+            setLoading(true);
+            try {
+              await api.delete(`/api/users/me/activities/${activity.id}`);
+              setIsJoined(false);
+              setVolunteerCount(prev => Math.max(0, prev - 1));
+              Alert.alert('Berhasil', 'Pendaftaran Anda telah dibatalkan.');
+            } catch (error: any) {
+              const message = error.response?.data?.message || 'Gagal membatalkan pendaftaran.';
+              Alert.alert('Error', message);
             } finally {
               setLoading(false);
             }
@@ -46,7 +96,7 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
       })
     },
     { icon: '📍', label: 'Lokasi Kegiatan', value: activity.location },
-    { icon: '👥', label: 'Total Relawan', value: `${activity._count?.volunteers || 0} Orang Terdaftar` },
+    { icon: '👥', label: 'Total Relawan', value: `${volunteerCount} Orang Terdaftar` },
   ];
 
   return (
@@ -60,9 +110,16 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
           <Text style={styles.heroTitle}>{activity.title}</Text>
           <View style={styles.heroVolunteer}>
             <Text style={styles.heroVolunteerText}>
-              👥 {activity._count?.volunteers || 0} relawan sudah bergabung
+              👥 {volunteerCount} relawan sudah bergabung
             </Text>
           </View>
+
+          {/* Status Badge */}
+          {!checkingStatus && isJoined && (
+            <View style={styles.joinedBadge}>
+              <Text style={styles.joinedBadgeText}>✅ Anda sudah terdaftar</Text>
+            </View>
+          )}
         </LinearGradient>
 
         {/* Info Cards */}
@@ -88,37 +145,50 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
           </View>
         </View>
 
-        <View style={{ height: 110 }} />
+        <View style={{ height: 120 }} />
       </ScrollView>
 
       {/* CTA Button */}
       <View style={styles.footerOverlay}>
-        <TouchableOpacity
-          onPress={handleJoin}
-          disabled={loading}
-          activeOpacity={0.85}
-        >
-          <LinearGradient colors={['#10b981', '#059669']} style={styles.joinButton}>
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <>
-                <Text style={styles.joinButtonIcon}>🤝</Text>
-                <Text style={styles.joinButtonText}>Daftar Sebagai Relawan</Text>
-              </>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
+        {checkingStatus ? (
+          <View style={styles.loadingBtn}>
+            <ActivityIndicator color="#10b981" />
+            <Text style={styles.loadingBtnText}>Memeriksa status...</Text>
+          </View>
+        ) : isJoined ? (
+          <TouchableOpacity onPress={handleUnjoin} disabled={loading} activeOpacity={0.85}>
+            <View style={styles.unjoinButton}>
+              {loading ? (
+                <ActivityIndicator color="#ef4444" />
+              ) : (
+                <>
+                  <Text style={styles.unjoinButtonIcon}>✖</Text>
+                  <Text style={styles.unjoinButtonText}>Batalkan Pendaftaran</Text>
+                </>
+              )}
+            </View>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={handleJoin} disabled={loading} activeOpacity={0.85}>
+            <LinearGradient colors={['#10b981', '#059669']} style={styles.joinButton}>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <>
+                  <Text style={styles.joinButtonIcon}>🤝</Text>
+                  <Text style={styles.joinButtonText}>Daftar Sebagai Relawan</Text>
+                </>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f0fdf4',
-  },
+  container: { flex: 1, backgroundColor: '#f0fdf4' },
   hero: {
     padding: 28,
     paddingTop: 32,
@@ -132,11 +202,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 16,
   },
-  heroBadgeText: {
-    color: '#ffffff',
-    fontWeight: '700',
-    fontSize: 13,
-  },
+  heroBadgeText: { color: '#ffffff', fontWeight: '700', fontSize: 13 },
   heroTitle: {
     fontSize: 26,
     fontWeight: '800',
@@ -151,12 +217,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 16,
+    marginBottom: 10,
   },
-  heroVolunteerText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
+  heroVolunteerText: { color: '#ffffff', fontSize: 14, fontWeight: '600' },
+  joinedBadge: {
+    backgroundColor: '#ffffff',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    marginTop: 6,
   },
+  joinedBadgeText: { color: '#059669', fontSize: 14, fontWeight: '800' },
   infoSection: {
     paddingHorizontal: 20,
     marginTop: -24,
@@ -185,36 +257,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  infoIconText: {
-    fontSize: 22,
-  },
-  infoContent: {
-    flex: 1,
-  },
+  infoIconText: { fontSize: 22 },
+  infoContent: { flex: 1 },
   infoLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#64748b',
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 4,
   },
-  infoValue: {
-    fontSize: 15,
-    color: '#064e3b',
-    fontWeight: '700',
-    lineHeight: 22,
-  },
-  descSection: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-  },
-  descTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#0f172a',
-    marginBottom: 12,
-  },
+  infoValue: { fontSize: 15, color: '#064e3b', fontWeight: '700', lineHeight: 22 },
+  descSection: { paddingHorizontal: 20, paddingTop: 24 },
+  descTitle: { fontSize: 18, fontWeight: '800', color: '#0f172a', marginBottom: 12 },
   descCard: {
     backgroundColor: '#ffffff',
     borderRadius: 20,
@@ -227,22 +282,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d1fae5',
   },
-  descText: {
-    fontSize: 15,
-    color: '#475569',
-    lineHeight: 28,
-  },
+  descText: { fontSize: 15, color: '#475569', lineHeight: 28 },
   footerOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(240,253,244,0.95)',
+    backgroundColor: 'rgba(240,253,244,0.97)',
     padding: 20,
     paddingBottom: 28,
     borderTopWidth: 1,
     borderTopColor: '#d1fae5',
   },
+  loadingBtn: {
+    padding: 18,
+    borderRadius: 22,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#f0fdf4',
+    borderWidth: 1,
+    borderColor: '#d1fae5',
+  },
+  loadingBtnText: { color: '#64748b', fontSize: 15, fontWeight: '600' },
   joinButton: {
     padding: 20,
     borderRadius: 22,
@@ -256,13 +319,19 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
   },
-  joinButtonIcon: {
-    fontSize: 20,
+  joinButtonIcon: { fontSize: 20 },
+  joinButtonText: { color: '#ffffff', fontSize: 18, fontWeight: '800', letterSpacing: 0.3 },
+  unjoinButton: {
+    padding: 20,
+    borderRadius: 22,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    borderWidth: 2,
+    borderColor: '#ef4444',
+    backgroundColor: '#fff5f5',
   },
-  joinButtonText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '800',
-    letterSpacing: 0.3,
-  },
+  unjoinButtonIcon: { fontSize: 18, color: '#ef4444' },
+  unjoinButtonText: { color: '#ef4444', fontSize: 17, fontWeight: '800' },
 });
