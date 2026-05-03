@@ -61,7 +61,7 @@ export default function RegisterScreen({ navigation }: any) {
           <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
             <View style={styles.logoContainer}>
               <Image 
-                source={require('../../assets/logo.jpeg')} 
+                source={require('../../assets/logo.png')} 
                 style={styles.logoImage} 
                 resizeMode="cover"
               />
