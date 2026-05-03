@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
   View, Text, FlatList, StyleSheet, ActivityIndicator,
-  RefreshControl, Animated
+  RefreshControl, Animated, TouchableOpacity, Alert
 } from 'react-native';
 import api from '../lib/api';
 import { VolunteerActivity } from '../types';
@@ -11,11 +11,13 @@ export default function HistoryScreen() {
   const [history, setHistory] = useState<VolunteerActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [unjoinLoading, setUnjoinLoading] = useState<string | null>(null);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const fetchHistory = async () => {
     try {
+      // Gunakan endpoint yang sudah benar
       const response = await api.get<VolunteerActivity[]>('/api/users/me/activities');
       setHistory(response.data);
       Animated.timing(fadeAnim, {
@@ -40,6 +42,32 @@ export default function HistoryScreen() {
     fetchHistory();
   };
 
+  const handleUnjoin = (item: VolunteerActivity) => {
+    Alert.alert(
+      'Batalkan Partisipasi',
+      `Anda yakin ingin membatalkan pendaftaran dari kegiatan:\n\n"${item.activity.title}"?`,
+      [
+        { text: 'Tidak', style: 'cancel' },
+        {
+          text: 'Ya, Batalkan',
+          style: 'destructive',
+          onPress: async () => {
+            setUnjoinLoading(item.activityId);
+            try {
+              await api.delete(`/api/users/me/activities/${item.activityId}`);
+              setHistory(prev => prev.filter(h => h.activityId !== item.activityId));
+            } catch (error: any) {
+              const message = error.response?.data?.message || 'Gagal membatalkan pendaftaran.';
+              Alert.alert('Error', message);
+            } finally {
+              setUnjoinLoading(null);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const renderItem = ({ item }: { item: VolunteerActivity }) => (
     <Animated.View style={{ opacity: fadeAnim }}>
       <View style={styles.card}>
@@ -50,7 +78,8 @@ export default function HistoryScreen() {
               <Text style={styles.badgeText}>✅ Terdaftar</Text>
             </View>
           </View>
-          <View style={styles.cardFooter}>
+
+          <View style={styles.cardInfo}>
             <View style={styles.infoChip}>
               <Text style={styles.infoIcon}>📅</Text>
               <View>
@@ -60,6 +89,13 @@ export default function HistoryScreen() {
                     day: 'numeric', month: 'long', year: 'numeric'
                   })}
                 </Text>
+              </View>
+            </View>
+            <View style={styles.infoChip}>
+              <Text style={styles.infoIcon}>📍</Text>
+              <View>
+                <Text style={styles.infoLabel}>Lokasi</Text>
+                <Text style={styles.infoValue} numberOfLines={1}>{item.activity.location}</Text>
               </View>
             </View>
             <View style={styles.infoChip}>
@@ -74,6 +110,19 @@ export default function HistoryScreen() {
               </View>
             </View>
           </View>
+
+          <TouchableOpacity
+            style={styles.unjoinBtn}
+            onPress={() => handleUnjoin(item)}
+            disabled={unjoinLoading === item.activityId}
+            activeOpacity={0.8}
+          >
+            {unjoinLoading === item.activityId ? (
+              <ActivityIndicator size="small" color="#ef4444" />
+            ) : (
+              <Text style={styles.unjoinBtnText}>✖ Batalkan Pendaftaran</Text>
+            )}
+          </TouchableOpacity>
         </LinearGradient>
       </View>
     </Animated.View>
@@ -216,20 +265,21 @@ const styles = StyleSheet.create({
   },
   badge: {
     backgroundColor: '#059669',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
   },
   badgeText: {
     color: '#ffffff',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
   },
-  cardFooter: {
+  cardInfo: {
+    gap: 12,
     borderTopWidth: 1,
     borderTopColor: '#d1fae5',
     paddingTop: 14,
-    gap: 12,
+    marginBottom: 16,
   },
   infoChip: {
     flexDirection: 'row',
@@ -240,13 +290,27 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   infoLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#64748b',
-    fontWeight: '500',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
   infoValue: {
     fontSize: 14,
     color: '#064e3b',
+    fontWeight: '700',
+  },
+  unjoinBtn: {
+    borderWidth: 1.5,
+    borderColor: '#ef4444',
+    borderRadius: 14,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  unjoinBtnText: {
+    color: '#ef4444',
+    fontSize: 14,
     fontWeight: '700',
   },
   center: {
