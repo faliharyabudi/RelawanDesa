@@ -61,9 +61,9 @@ export default function AddActivityScreen({ navigation }: any) {
       // Jika ada gambar, upload dulu gambarnya
       if (imageUri) {
         const formData = new FormData();
-        const filename = imageUri.split('/').pop();
-        const match = /\.(\w+)$/.exec(filename || '');
-        const type = match ? `image/${match[1]}` : `image`;
+        const filename = imageUri.split('/').pop() || 'photo.jpg';
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image/jpeg`;
 
         formData.append('file', {
           uri: imageUri,
@@ -71,23 +71,13 @@ export default function AddActivityScreen({ navigation }: any) {
           type,
         } as any);
 
-        const token = await AsyncStorage.getItem('token');
-        const uploadRes = await fetch(`${API_URL}/api/activities/upload`, {
-          method: 'POST',
-          body: formData,
+        const uploadRes = await api.post('/api/activities/upload', formData, {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            // jangan set Content-Type secara manual untuk FormData di fetch react-native
+            'Content-Type': 'multipart/form-data',
           },
         });
         
-        if (!uploadRes.ok) {
-          throw new Error('Gagal mengupload foto');
-        }
-
-        const uploadData = await uploadRes.json();
-        uploadedImageUrl = uploadData.imageUrl;
+        uploadedImageUrl = uploadRes.data.imageUrl;
       }
 
       // Submit data kegiatan

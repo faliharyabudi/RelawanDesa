@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  ActivityIndicator, Alert, ImageBackground
+  ActivityIndicator, Alert, ImageBackground, Linking
 } from 'react-native';
 import api, { API_URL } from '../lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -104,7 +104,12 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       })
     },
-    { icon: <Ionicons name="location" size={24} color="#059669" />, label: 'Lokasi Kegiatan', value: activity.location },
+    { 
+      icon: <Ionicons name="location" size={24} color="#059669" />, 
+      label: 'Lokasi Kegiatan', 
+      value: activity.location,
+      isLocation: true
+    },
     { icon: <Ionicons name="people" size={24} color="#059669" />, label: 'Total Relawan', value: `${volunteerCount} Orang Terdaftar` },
   ];
 
@@ -166,17 +171,41 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
 
         {/* Info Cards */}
         <View style={styles.infoSection}>
-          {infoItems.map((item, index) => (
-            <View key={index} style={styles.infoCard}>
-              <View style={styles.infoIconBox}>
-                {item.icon}
+          {infoItems.map((item, index) => {
+            const content = (
+              <View key={index} style={styles.infoCard}>
+                <View style={styles.infoIconBox}>
+                  {item.icon}
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>{item.label}</Text>
+                  <Text style={[styles.infoValue, item.isLocation && { color: '#0ea5e9', textDecorationLine: 'underline' }]}>{item.value}</Text>
+                </View>
+                {item.isLocation && (
+                  <Ionicons name="open-outline" size={20} color="#0ea5e9" />
+                )}
               </View>
-              <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>{item.label}</Text>
-                <Text style={styles.infoValue}>{item.value}</Text>
-              </View>
-            </View>
-          ))}
+            );
+
+            if (item.isLocation) {
+              return (
+                <TouchableOpacity 
+                  key={index} 
+                  activeOpacity={0.7} 
+                  onPress={() => {
+                    if (item.value.startsWith('http')) {
+                      Linking.openURL(item.value);
+                    } else {
+                      Linking.openURL(`https://maps.google.com/?q=${encodeURIComponent(item.value)}`);
+                    }
+                  }}
+                >
+                  {content}
+                </TouchableOpacity>
+              );
+            }
+            return content;
+          })}
         </View>
 
         {/* Description */}

@@ -1,12 +1,37 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal, TextInput, ActivityIndicator } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import api from '../lib/api';
 
 export default function ProfileScreen({ navigation }: any) {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  
+  const [isEditNameModalVisible, setEditNameModalVisible] = useState(false);
+  const [newName, setNewName] = useState(user?.name || '');
+  const [isUpdatingName, setIsUpdatingName] = useState(false);
+
+  const handleUpdateName = async () => {
+    if (!newName.trim()) {
+      Alert.alert('Perhatian', 'Nama tidak boleh kosong');
+      return;
+    }
+    
+    setIsUpdatingName(true);
+    try {
+      await api.put('/api/users/me/name', { name: newName.trim() });
+      await updateUser({ name: newName.trim() });
+      setEditNameModalVisible(false);
+      Alert.alert('Berhasil', 'Nama Anda telah diperbarui.');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Gagal memperbarui nama');
+    } finally {
+      setIsUpdatingName(false);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -61,6 +86,9 @@ export default function ProfileScreen({ navigation }: any) {
                 <Text style={styles.cardLabel}>Nama Lengkap</Text>
                 <Text style={styles.cardValue}>{user?.name}</Text>
               </View>
+              <TouchableOpacity onPress={() => { setNewName(user?.name || ''); setEditNameModalVisible(true); }}>
+                <Ionicons name="pencil" size={20} color="#64748b" />
+              </TouchableOpacity>
             </View>
             
             <View style={styles.divider} />
@@ -130,6 +158,46 @@ export default function ProfileScreen({ navigation }: any) {
           <Text style={styles.version}>Versi 1.0.0</Text>
         </View>
       </ScrollView>
+
+      {/* Edit Name Modal */}
+      <Modal
+        visible={isEditNameModalVisible}
+        transparent={true}
+        animationType="fade"
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Ganti Nama</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={newName}
+              onChangeText={setNewName}
+              placeholder="Masukkan nama baru"
+              autoCapitalize="words"
+            />
+            <View style={styles.modalActions}>
+              <TouchableOpacity 
+                style={styles.modalBtnCancel} 
+                onPress={() => setEditNameModalVisible(false)}
+                disabled={isUpdatingName}
+              >
+                <Text style={styles.modalBtnCancelText}>Batal</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.modalBtnSave} 
+                onPress={handleUpdateName}
+                disabled={isUpdatingName}
+              >
+                {isUpdatingName ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.modalBtnSaveText}>Simpan</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -298,5 +366,66 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     fontSize: 13,
     marginBottom: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#0f172a',
+    marginBottom: 16,
+  },
+  modalInput: {
+    borderWidth: 1.5,
+    borderColor: '#e2e8f0',
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+    color: '#334155',
+    marginBottom: 20,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+  },
+  modalBtnCancel: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+  },
+  modalBtnCancelText: {
+    color: '#64748b',
+    fontWeight: '600',
+    fontSize: 15,
+  },
+  modalBtnSave: {
+    backgroundColor: '#059669',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  modalBtnSaveText: {
+    color: '#ffffff',
+    fontWeight: '600',
+    fontSize: 15,
   }
 });

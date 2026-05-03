@@ -33,6 +33,15 @@ export class UsersController {
     return this.usersService.getMe(userId);
   }
 
+  // User: update nama profil sendiri
+  @Put('me/name')
+  updateMyName(
+    @CurrentUser('userId') userId: string,
+    @Body('name') name: string,
+  ) {
+    return this.usersService.update(userId, { name });
+  }
+
   // User: lihat riwayat kegiatan sendiri
   @Get('me/activities')
   getMyActivities(@CurrentUser('userId') userId: string) {
