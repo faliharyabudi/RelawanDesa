@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView
+  ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Image
 } from 'react-native';
-import api from '../lib/api';
+import * as ImagePicker from 'expo-image-picker';
+import api, { API_URL } from '../lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function AddActivityScreen({ navigation }: any) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [date, setDate] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Validasi format tanggal sederhana: YYYY-MM-DD
@@ -22,9 +25,28 @@ export default function AddActivityScreen({ navigation }: any) {
     return d instanceof Date && !isNaN(d.getTime());
   };
 
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Izin Ditolak', 'Kami butuh izin akses galeri untuk mengupload foto.');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!title.trim() || !description.trim() || !location.trim() || !date.trim()) {
-      Alert.alert('Perhatian', 'Semua kolom harus diisi.');
+      Alert.alert('Perhatian', 'Semua kolom teks harus diisi.');
       return;
     }
     if (!isValidDate(date.trim())) {
@@ -34,12 +56,49 @@ export default function AddActivityScreen({ navigation }: any) {
 
     setLoading(true);
     try {
+      let uploadedImageUrl = null;
+
+      // Jika ada gambar, upload dulu gambarnya
+      if (imageUri) {
+        const formData = new FormData();
+        const filename = imageUri.split('/').pop();
+        const match = /\.(\w+)$/.exec(filename || '');
+        const type = match ? `image/${match[1]}` : `image`;
+
+        formData.append('file', {
+          uri: imageUri,
+          name: filename,
+          type,
+        } as any);
+
+        const token = await AsyncStorage.getItem('token');
+        const uploadRes = await fetch(`${API_URL}/api/activities/upload`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            // jangan set Content-Type secara manual untuk FormData di fetch react-native
+          },
+        });
+        
+        if (!uploadRes.ok) {
+          throw new Error('Gagal mengupload foto');
+        }
+
+        const uploadData = await uploadRes.json();
+        uploadedImageUrl = uploadData.imageUrl;
+      }
+
+      // Submit data kegiatan
       await api.post('/api/activities', {
         title: title.trim(),
         description: description.trim(),
         location: location.trim(),
         date: new Date(date.trim()).toISOString(),
+        ...(uploadedImageUrl ? { imageUrl: uploadedImageUrl } : {}),
       });
+
       Alert.alert('Berhasil!', 'Kegiatan baru berhasil ditambahkan.', [
         {
           text: 'Oke',
@@ -49,7 +108,8 @@ export default function AddActivityScreen({ navigation }: any) {
         }
       ]);
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Gagal menambahkan kegiatan.';
+      console.error(error);
+      const message = error.response?.data?.message || error.message || 'Gagal menambahkan kegiatan.';
       Alert.alert('Error', Array.isArray(message) ? message.join('\n') : message);
     } finally {
       setLoading(false);
@@ -106,6 +166,24 @@ export default function AddActivityScreen({ navigation }: any) {
             </LinearGradient>
             <Text style={styles.title}>Tambah Kegiatan</Text>
             <Text style={styles.subtitle}>Isi detail kegiatan sosial baru</Text>
+          </View>
+
+          {/* Image Picker */}
+          <View style={styles.inputGroup}>
+            <View style={styles.labelRow}>
+              <Ionicons name="image" size={18} color="#0f172a" />
+              <Text style={styles.label}>Foto Kegiatan (Opsional)</Text>
+            </View>
+            <TouchableOpacity style={styles.imagePickerBtn} onPress={pickImage} activeOpacity={0.8}>
+              {imageUri ? (
+                <Image source={{ uri: imageUri }} style={styles.previewImage} />
+              ) : (
+                <View style={styles.imagePlaceholder}>
+                  <Ionicons name="camera" size={32} color="#94a3b8" />
+                  <Text style={styles.imagePlaceholderText}>Pilih dari Galeri</Text>
+                </View>
+              )}
+            </TouchableOpacity>
           </View>
 
           {/* Form Fields */}
@@ -233,6 +311,32 @@ const styles = StyleSheet.create({
   inputMultiline: {
     height: 100,
     paddingTop: 16,
+  },
+  imagePickerBtn: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1.5,
+    borderColor: '#e2e8f0',
+    borderRadius: 18,
+    overflow: 'hidden',
+    borderStyle: 'dashed',
+    height: 160,
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  imagePlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+  },
+  imagePlaceholderText: {
+    marginTop: 8,
+    color: '#94a3b8',
+    fontSize: 14,
+    fontWeight: '500',
   },
   tipBox: {
     flexDirection: 'row',

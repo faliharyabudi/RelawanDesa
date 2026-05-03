@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  ActivityIndicator, Alert
+  ActivityIndicator, Alert, ImageBackground
 } from 'react-native';
-import api from '../lib/api';
+import api, { API_URL } from '../lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -103,27 +103,57 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
-        <LinearGradient colors={['#059669', '#34d399']} style={styles.hero}>
-          <View style={styles.heroBadge}>
-            <Ionicons name="leaf" size={16} color="#ffffff" style={{marginRight: 4}} />
-            <Text style={styles.heroBadgeText}>Aksi Sosial</Text>
-          </View>
-          <Text style={styles.heroTitle}>{activity.title}</Text>
-          <View style={styles.heroVolunteer}>
-            <Ionicons name="people" size={16} color="#d1fae5" style={{marginRight: 6}} />
-            <Text style={styles.heroVolunteerText}>
-              {volunteerCount} relawan sudah bergabung
-            </Text>
-          </View>
+        {activity.imageUrl ? (
+          <ImageBackground 
+            source={{ uri: `${API_URL}${activity.imageUrl}` }} 
+            style={styles.heroImageBg}
+            imageStyle={{ opacity: 0.7 }}
+          >
+            <LinearGradient colors={['rgba(5,150,105,0.4)', 'rgba(5,150,105,0.9)']} style={styles.heroGradientOverlay}>
+              <View style={styles.heroBadge}>
+                <Ionicons name="leaf" size={16} color="#ffffff" style={{marginRight: 4}} />
+                <Text style={styles.heroBadgeText}>Aksi Sosial</Text>
+              </View>
+              <Text style={styles.heroTitle}>{activity.title}</Text>
+              <View style={styles.heroVolunteer}>
+                <Ionicons name="people" size={16} color="#d1fae5" style={{marginRight: 6}} />
+                <Text style={styles.heroVolunteerText}>
+                  {volunteerCount} relawan sudah bergabung
+                </Text>
+              </View>
 
-          {/* Status Badge */}
-          {!checkingStatus && isJoined && (
-            <View style={styles.joinedBadge}>
-              <Ionicons name="checkmark-circle" size={16} color="#059669" style={{marginRight: 6}} />
-              <Text style={styles.joinedBadgeText}>Anda sudah terdaftar</Text>
+              {/* Status Badge */}
+              {!checkingStatus && isJoined && (
+                <View style={styles.joinedBadge}>
+                  <Ionicons name="checkmark-circle" size={16} color="#059669" style={{marginRight: 6}} />
+                  <Text style={styles.joinedBadgeText}>Anda sudah terdaftar</Text>
+                </View>
+              )}
+            </LinearGradient>
+          </ImageBackground>
+        ) : (
+          <LinearGradient colors={['#059669', '#34d399']} style={styles.hero}>
+            <View style={styles.heroBadge}>
+              <Ionicons name="leaf" size={16} color="#ffffff" style={{marginRight: 4}} />
+              <Text style={styles.heroBadgeText}>Aksi Sosial</Text>
             </View>
-          )}
-        </LinearGradient>
+            <Text style={styles.heroTitle}>{activity.title}</Text>
+            <View style={styles.heroVolunteer}>
+              <Ionicons name="people" size={16} color="#d1fae5" style={{marginRight: 6}} />
+              <Text style={styles.heroVolunteerText}>
+                {volunteerCount} relawan sudah bergabung
+              </Text>
+            </View>
+
+            {/* Status Badge */}
+            {!checkingStatus && isJoined && (
+              <View style={styles.joinedBadge}>
+                <Ionicons name="checkmark-circle" size={16} color="#059669" style={{marginRight: 6}} />
+                <Text style={styles.joinedBadgeText}>Anda sudah terdaftar</Text>
+              </View>
+            )}
+          </LinearGradient>
+        )}
 
         {/* Info Cards */}
         <View style={styles.infoSection}>
@@ -193,6 +223,14 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f0fdf4' },
   hero: {
+    padding: 28,
+    paddingTop: 32,
+    paddingBottom: 48,
+  },
+  heroImageBg: {
+    backgroundColor: '#059669',
+  },
+  heroGradientOverlay: {
     padding: 28,
     paddingTop: 32,
     paddingBottom: 48,

@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
-  ActivityIndicator, RefreshControl, Animated
+  ActivityIndicator, RefreshControl, Animated, Image
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../lib/api';
+import api, { API_URL } from '../lib/api';
 import { Activity } from '../types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -52,7 +52,10 @@ export default function HomeScreen({ navigation }: any) {
         onPress={() => navigation.navigate('ActivityDetail', { activity: item })}
       >
         <LinearGradient colors={['#ffffff', '#f8fafc']} style={styles.cardGradient}>
-          <View style={styles.cardHeader}>
+          {item.imageUrl && (
+            <Image source={{ uri: `${API_URL}${item.imageUrl}` }} style={styles.cardImage} />
+          )}
+          <View style={[styles.cardHeader, item.imageUrl && { marginTop: 16 }]}>
             <View style={styles.badge}>
               <Text style={styles.badgeText}>Aksi Sosial</Text>
             </View>
@@ -336,6 +339,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: '#e2e8f0',
+  },
+  cardImage: {
+    width: '100%',
+    height: 140,
+    borderRadius: 16,
+    marginBottom: 0,
+    backgroundColor: '#e2e8f0',
   },
   cardHeader: {
     flexDirection: 'row',

@@ -37,6 +37,7 @@ model Activity {
   description String   @db.Text
   location    String
   date        DateTime
+  imageUrl    String?  @db.Text
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
