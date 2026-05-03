@@ -1,9 +1,9 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
@@ -46,17 +46,23 @@ function MainTabNavigator() {
       <Tab.Screen
         name="Beranda"
         component={HomeScreen}
-        options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🏡</Text> }}
+        options={{ 
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={24} color={color} /> 
+        }}
       />
       <Tab.Screen
         name="Riwayat"
         component={HistoryScreen}
-        options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>📋</Text> }}
+        options={{ 
+          tabBarIcon: ({ color, size }) => <Ionicons name="time" size={24} color={color} /> 
+        }}
       />
       <Tab.Screen
         name="Profil"
         component={ProfileScreen}
-        options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>👤</Text> }}
+        options={{ 
+          tabBarIcon: ({ color, size }) => <Ionicons name="person" size={24} color={color} /> 
+        }}
       />
     </Tab.Navigator>
   );

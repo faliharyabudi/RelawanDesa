@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../lib/api';
 import { Activity } from '../types';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen({ navigation }: any) {
   const { user } = useAuth();
@@ -16,7 +17,6 @@ export default function HomeScreen({ navigation }: any) {
   const isAdmin = user?.role === 'ADMIN';
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
 
   const fetchActivities = async () => {
     try {
@@ -44,42 +44,42 @@ export default function HomeScreen({ navigation }: any) {
     fetchActivities();
   };
 
-  const renderItem = ({ item, index }: { item: Activity; index: number }) => (
+  const renderItem = ({ item }: { item: Activity }) => (
     <Animated.View style={{ opacity: fadeAnim }}>
       <TouchableOpacity
         style={styles.card}
+        activeOpacity={0.9}
         onPress={() => navigation.navigate('ActivityDetail', { activity: item })}
-        activeOpacity={0.85}
       >
-        <LinearGradient
-          colors={['#ecfdf5', '#ffffff']}
-          style={styles.cardGradient}
-        >
+        <LinearGradient colors={['#ffffff', '#f8fafc']} style={styles.cardGradient}>
           <View style={styles.cardHeader}>
-            <View style={styles.cardTitleContainer}>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-            </View>
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>👥 {item._count?.volunteers || 0}</Text>
+              <Text style={styles.badgeText}>Aksi Sosial</Text>
+            </View>
+            <View style={styles.volunteerBadge}>
+              <Ionicons name="people" size={14} color="#059669" />
+              <Text style={styles.volunteerText}>
+                {item._count?.volunteers || 0} Terdaftar
+              </Text>
             </View>
           </View>
+          
+          <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
           <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
+          
           <View style={styles.cardFooter}>
-            <View style={styles.infoRow}>
-              <View style={styles.infoChip}>
-                <Text style={styles.iconText}>📍</Text>
-                <Text style={styles.cardInfo}>{item.location}</Text>
-              </View>
-              <View style={styles.infoChip}>
-                <Text style={styles.iconText}>📅</Text>
-                <Text style={styles.cardInfo}>
-                  {new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </Text>
-              </View>
+            <View style={styles.footerItem}>
+              <Ionicons name="calendar-outline" size={14} color="#64748b" />
+              <Text style={styles.footerText}>
+                {new Date(item.date).toLocaleDateString('id-ID', {
+                  day: 'numeric', month: 'short', year: 'numeric'
+                })}
+              </Text>
             </View>
-            <LinearGradient colors={['#10b981', '#059669']} style={styles.arrowBtn}>
-              <Text style={styles.arrowText}>→</Text>
-            </LinearGradient>
+            <View style={styles.footerItem}>
+              <Ionicons name="location-outline" size={14} color="#64748b" />
+              <Text style={styles.footerText} numberOfLines={1}>{item.location}</Text>
+            </View>
           </View>
         </LinearGradient>
       </TouchableOpacity>
@@ -93,7 +93,7 @@ export default function HomeScreen({ navigation }: any) {
         <View style={styles.headerContent}>
           <View>
             <Text style={styles.greetingSmall}>Halo,</Text>
-            <Text style={styles.greeting}>{user?.name?.split(' ')[0]} 👋</Text>
+            <Text style={styles.greeting}>{user?.name?.split(' ')[0]} <Ionicons name="hand-left" size={24} color="#fcd34d" /></Text>
             <Text style={styles.subtitle}>Mari buat perubahan hari ini!</Text>
           </View>
           <View style={styles.avatarMini}>
@@ -133,7 +133,8 @@ export default function HomeScreen({ navigation }: any) {
             activeOpacity={0.85}
           >
             <LinearGradient colors={['#10b981', '#059669']} style={styles.addBtn}>
-              <Text style={styles.addBtnText}>＋ Tambah</Text>
+              <Ionicons name="add" size={16} color="#ffffff" style={{marginRight: 4}} />
+              <Text style={styles.addBtnText}>Tambah</Text>
             </LinearGradient>
           </TouchableOpacity>
         )}
@@ -142,7 +143,7 @@ export default function HomeScreen({ navigation }: any) {
       {/* Banner Admin */}
       {isAdmin && (
         <View style={styles.adminBanner}>
-          <Text style={styles.adminBannerIcon}>⭐</Text>
+          <Ionicons name="shield-checkmark" size={20} color="#92400e" style={styles.adminBannerIcon} />
           <Text style={styles.adminBannerText}>Mode Admin aktif — Anda bisa menambah dan mengelola kegiatan.</Text>
         </View>
       )}
@@ -164,7 +165,7 @@ export default function HomeScreen({ navigation }: any) {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyEmoji}>🌾</Text>
+              <Ionicons name="leaf-outline" size={56} color="#94a3b8" style={{ marginBottom: 16 }} />
               <Text style={styles.emptyTitle}>Belum Ada Kegiatan</Text>
               <Text style={styles.emptyText}>Belum ada kegiatan sosial yang tersedia saat ini. Coba lagi nanti.</Text>
             </View>
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 24,
     paddingTop: 60,
-    paddingBottom: 24,
+    paddingBottom: 32,
     borderBottomLeftRadius: 36,
     borderBottomRightRadius: 36,
     shadowColor: '#059669',
@@ -216,50 +217,51 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   avatarMini: {
-    width: 52,
-    height: 52,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#ffffff',
-    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   avatarMiniText: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '800',
     color: '#059669',
   },
   statRow: {
     flexDirection: 'row',
     backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: 20,
-    padding: 16,
+    paddingVertical: 16,
+    justifyContent: 'space-evenly',
     alignItems: 'center',
-    justifyContent: 'space-around',
   },
   statBox: {
     alignItems: 'center',
     flex: 1,
   },
   statNum: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '800',
     color: '#ffffff',
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#d1fae5',
-    marginTop: 2,
-    fontWeight: '500',
+    fontWeight: '600',
+    marginTop: 4,
+    textTransform: 'uppercase',
   },
   statDivider: {
     width: 1,
-    height: 36,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    height: 30,
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   sectionHeader: {
     paddingHorizontal: 24,
@@ -280,7 +282,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   addBtn: {
-    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
     shadowColor: '#10b981',
@@ -306,7 +310,6 @@ const styles = StyleSheet.create({
     borderColor: '#fde68a',
   },
   adminBannerIcon: {
-    fontSize: 20,
     marginRight: 10,
   },
   adminBannerText: {
@@ -323,86 +326,78 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginBottom: 16,
     shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 6 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#d1fae5',
+    shadowRadius: 10,
+    elevation: 3,
   },
   cardGradient: {
+    borderRadius: 24,
     padding: 20,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10,
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  cardTitleContainer: {
-    flex: 1,
-    marginRight: 12,
+  badge: {
+    backgroundColor: '#10b981',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  badgeText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  volunteerBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ecfdf5',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    gap: 4,
+  },
+  volunteerText: {
+    color: '#059669',
+    fontSize: 12,
+    fontWeight: '700',
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#064e3b',
+    color: '#0f172a',
+    marginBottom: 8,
     lineHeight: 24,
-  },
-  badge: {
-    backgroundColor: '#059669',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  badgeText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '700',
   },
   cardDesc: {
     fontSize: 14,
     color: '#475569',
-    marginBottom: 16,
     lineHeight: 22,
+    marginBottom: 16,
   },
   cardFooter: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     borderTopWidth: 1,
-    borderTopColor: '#d1fae5',
-    paddingTop: 14,
+    borderTopColor: '#f1f5f9',
+    paddingTop: 16,
+    gap: 16,
   },
-  infoRow: {
+  footerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
     gap: 6,
   },
-  infoChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  iconText: {
-    fontSize: 13,
-  },
-  cardInfo: {
-    fontSize: 13,
-    color: '#475569',
+  footerText: {
+    fontSize: 12,
+    color: '#64748b',
     fontWeight: '600',
-  },
-  arrowBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  arrowText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   center: {
     flex: 1,
@@ -418,10 +413,6 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
     alignItems: 'center',
     paddingHorizontal: 32,
-  },
-  emptyEmoji: {
-    fontSize: 56,
-    marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 18,

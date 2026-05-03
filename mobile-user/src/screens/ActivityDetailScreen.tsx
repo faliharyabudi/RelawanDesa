@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import api from '../lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ActivityDetailScreen({ route, navigation }: any) {
   const { activity } = route.params;
@@ -13,7 +14,6 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
   const [isJoined, setIsJoined] = useState(false);
   const [volunteerCount, setVolunteerCount] = useState<number>(activity._count?.volunteers || 0);
 
-  // Cek apakah user sudah join kegiatan ini
   useEffect(() => {
     const checkJoinStatus = async () => {
       try {
@@ -44,7 +44,7 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
               await api.post(`/api/activities/${activity.id}/join`);
               setIsJoined(true);
               setVolunteerCount(prev => prev + 1);
-              Alert.alert('Berhasil! 🎉', 'Terima kasih atas kepedulian Anda. Anda telah resmi terdaftar sebagai relawan.', [
+              Alert.alert('Berhasil!', 'Terima kasih atas kepedulian Anda. Anda telah resmi terdaftar sebagai relawan.', [
                 { text: 'Oke' }
               ]);
             } catch (error: any) {
@@ -89,14 +89,14 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
 
   const infoItems = [
     {
-      icon: '📅',
+      icon: <Ionicons name="calendar" size={24} color="#059669" />,
       label: 'Tanggal Pelaksanaan',
       value: new Date(activity.date).toLocaleDateString('id-ID', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       })
     },
-    { icon: '📍', label: 'Lokasi Kegiatan', value: activity.location },
-    { icon: '👥', label: 'Total Relawan', value: `${volunteerCount} Orang Terdaftar` },
+    { icon: <Ionicons name="location" size={24} color="#059669" />, label: 'Lokasi Kegiatan', value: activity.location },
+    { icon: <Ionicons name="people" size={24} color="#059669" />, label: 'Total Relawan', value: `${volunteerCount} Orang Terdaftar` },
   ];
 
   return (
@@ -105,19 +105,22 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
         {/* Hero Section */}
         <LinearGradient colors={['#059669', '#34d399']} style={styles.hero}>
           <View style={styles.heroBadge}>
-            <Text style={styles.heroBadgeText}>🌿 Aksi Sosial</Text>
+            <Ionicons name="leaf" size={16} color="#ffffff" style={{marginRight: 4}} />
+            <Text style={styles.heroBadgeText}>Aksi Sosial</Text>
           </View>
           <Text style={styles.heroTitle}>{activity.title}</Text>
           <View style={styles.heroVolunteer}>
+            <Ionicons name="people" size={16} color="#d1fae5" style={{marginRight: 6}} />
             <Text style={styles.heroVolunteerText}>
-              👥 {volunteerCount} relawan sudah bergabung
+              {volunteerCount} relawan sudah bergabung
             </Text>
           </View>
 
           {/* Status Badge */}
           {!checkingStatus && isJoined && (
             <View style={styles.joinedBadge}>
-              <Text style={styles.joinedBadgeText}>✅ Anda sudah terdaftar</Text>
+              <Ionicons name="checkmark-circle" size={16} color="#059669" style={{marginRight: 6}} />
+              <Text style={styles.joinedBadgeText}>Anda sudah terdaftar</Text>
             </View>
           )}
         </LinearGradient>
@@ -127,7 +130,7 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
           {infoItems.map((item, index) => (
             <View key={index} style={styles.infoCard}>
               <View style={styles.infoIconBox}>
-                <Text style={styles.infoIconText}>{item.icon}</Text>
+                {item.icon}
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>{item.label}</Text>
@@ -162,7 +165,7 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
                 <ActivityIndicator color="#ef4444" />
               ) : (
                 <>
-                  <Text style={styles.unjoinButtonIcon}>✖</Text>
+                  <Ionicons name="close-circle" size={20} color="#ef4444" style={{marginRight: 8}} />
                   <Text style={styles.unjoinButtonText}>Batalkan Pendaftaran</Text>
                 </>
               )}
@@ -175,7 +178,7 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <>
-                  <Text style={styles.joinButtonIcon}>🤝</Text>
+                  <Ionicons name="heart" size={20} color="#ffffff" style={{marginRight: 8}} />
                   <Text style={styles.joinButtonText}>Daftar Sebagai Relawan</Text>
                 </>
               )}
@@ -195,6 +198,8 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
   },
   heroBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.25)',
     alignSelf: 'flex-start',
     paddingHorizontal: 14,
@@ -202,136 +207,145 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 16,
   },
-  heroBadgeText: { color: '#ffffff', fontWeight: '700', fontSize: 13 },
+  heroBadgeText: { color: '#fff', fontSize: 13, fontWeight: '700' },
   heroTitle: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '800',
     color: '#ffffff',
-    lineHeight: 34,
-    marginBottom: 16,
+    lineHeight: 36,
     letterSpacing: -0.5,
+    marginBottom: 12,
   },
   heroVolunteer: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 16,
-    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
   },
-  heroVolunteerText: { color: '#ffffff', fontSize: 14, fontWeight: '600' },
+  heroVolunteerText: {
+    color: '#d1fae5',
+    fontSize: 14,
+    fontWeight: '500',
+  },
   joinedBadge: {
-    backgroundColor: '#ffffff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#d1fae5',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     alignSelf: 'flex-start',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 16,
-    marginTop: 6,
+    marginTop: 8,
   },
-  joinedBadgeText: { color: '#059669', fontSize: 14, fontWeight: '800' },
+  joinedBadgeText: {
+    color: '#059669',
+    fontWeight: '700',
+    fontSize: 14,
+  },
   infoSection: {
+    marginTop: -30,
     paddingHorizontal: 20,
-    marginTop: -24,
     gap: 12,
   },
   infoCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#ffffff',
+    padding: 20,
+    borderRadius: 20,
     shadowColor: '#10b981',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
-    shadowRadius: 10,
+    shadowRadius: 12,
     elevation: 3,
-    borderWidth: 1,
-    borderColor: '#d1fae5',
-    gap: 14,
   },
   infoIconBox: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#ecfdf5',
+    width: 52,
+    height: 52,
     borderRadius: 16,
+    backgroundColor: '#ecfdf5',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 16,
   },
-  infoIconText: { fontSize: 22 },
   infoContent: { flex: 1 },
-  infoLabel: {
-    fontSize: 11,
-    color: '#64748b',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 4,
+  infoLabel: { fontSize: 13, color: '#64748b', fontWeight: '500', marginBottom: 4 },
+  infoValue: { fontSize: 16, fontWeight: '700', color: '#0f172a' },
+  descSection: {
+    padding: 24,
   },
-  infoValue: { fontSize: 15, color: '#064e3b', fontWeight: '700', lineHeight: 22 },
-  descSection: { paddingHorizontal: 20, paddingTop: 24 },
-  descTitle: { fontSize: 18, fontWeight: '800', color: '#0f172a', marginBottom: 12 },
+  descTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#0f172a',
+    marginBottom: 16,
+  },
   descCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: '#10b981',
+    padding: 24,
+    borderRadius: 24,
+    shadowColor: '#94a3b8',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: '#d1fae5',
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 2,
   },
-  descText: { fontSize: 15, color: '#475569', lineHeight: 28 },
+  descText: {
+    fontSize: 15,
+    color: '#475569',
+    lineHeight: 26,
+  },
   footerOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(240,253,244,0.97)',
-    padding: 20,
-    paddingBottom: 28,
+    padding: 24,
+    paddingBottom: 36,
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderTopWidth: 1,
-    borderTopColor: '#d1fae5',
+    borderTopColor: '#f1f5f9',
   },
-  loadingBtn: {
-    padding: 18,
-    borderRadius: 22,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 10,
-    backgroundColor: '#f0fdf4',
-    borderWidth: 1,
-    borderColor: '#d1fae5',
-  },
-  loadingBtnText: { color: '#64748b', fontSize: 15, fontWeight: '600' },
   joinButton: {
-    padding: 20,
-    borderRadius: 22,
-    alignItems: 'center',
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
-    shadowColor: '#059669',
+    paddingVertical: 18,
+    borderRadius: 20,
+    shadowColor: '#10b981',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
-    shadowRadius: 12,
+    shadowRadius: 10,
     elevation: 8,
   },
-  joinButtonIcon: { fontSize: 20 },
-  joinButtonText: { color: '#ffffff', fontSize: 18, fontWeight: '800', letterSpacing: 0.3 },
+  joinButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   unjoinButton: {
-    padding: 20,
-    borderRadius: 22,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 18,
+    borderRadius: 20,
+    backgroundColor: '#fee2e2',
+    borderWidth: 1,
+    borderColor: '#fca5a5',
+  },
+  unjoinButtonText: {
+    color: '#ef4444',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  loadingBtn: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10,
-    borderWidth: 2,
-    borderColor: '#ef4444',
-    backgroundColor: '#fff5f5',
+    alignItems: 'center',
+    paddingVertical: 18,
+    gap: 12,
   },
-  unjoinButtonIcon: { fontSize: 18, color: '#ef4444' },
-  unjoinButtonText: { color: '#ef4444', fontSize: 17, fontWeight: '800' },
+  loadingBtnText: {
+    color: '#64748b',
+    fontWeight: '600',
+  },
 });

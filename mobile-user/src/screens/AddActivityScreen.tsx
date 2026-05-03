@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import api from '../lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AddActivityScreen({ navigation }: any) {
   const [title, setTitle] = useState('');
@@ -39,7 +40,7 @@ export default function AddActivityScreen({ navigation }: any) {
         location: location.trim(),
         date: new Date(date.trim()).toISOString(),
       });
-      Alert.alert('Berhasil! 🎉', 'Kegiatan baru berhasil ditambahkan.', [
+      Alert.alert('Berhasil!', 'Kegiatan baru berhasil ditambahkan.', [
         {
           text: 'Oke',
           onPress: () => {
@@ -57,7 +58,7 @@ export default function AddActivityScreen({ navigation }: any) {
 
   const fields = [
     {
-      icon: '📋',
+      icon: <Ionicons name="document-text" size={18} color="#0f172a" />,
       label: 'Judul Kegiatan',
       placeholder: 'Contoh: Gotong Royong Desa',
       value: title,
@@ -65,7 +66,7 @@ export default function AddActivityScreen({ navigation }: any) {
       multiline: false,
     },
     {
-      icon: '📝',
+      icon: <Ionicons name="pencil" size={18} color="#0f172a" />,
       label: 'Deskripsi Kegiatan',
       placeholder: 'Jelaskan tujuan dan detail kegiatan...',
       value: description,
@@ -73,7 +74,7 @@ export default function AddActivityScreen({ navigation }: any) {
       multiline: true,
     },
     {
-      icon: '📍',
+      icon: <Ionicons name="location" size={18} color="#0f172a" />,
       label: 'Lokasi',
       placeholder: 'Contoh: Balai Desa Sukamaju',
       value: location,
@@ -81,7 +82,7 @@ export default function AddActivityScreen({ navigation }: any) {
       multiline: false,
     },
     {
-      icon: '📅',
+      icon: <Ionicons name="calendar" size={18} color="#0f172a" />,
       label: 'Tanggal (Format: YYYY-MM-DD)',
       placeholder: 'Contoh: 2026-06-15',
       value: date,
@@ -101,7 +102,7 @@ export default function AddActivityScreen({ navigation }: any) {
           {/* Header */}
           <View style={styles.header}>
             <LinearGradient colors={['#34d399', '#059669']} style={styles.iconBox}>
-              <Text style={styles.iconText}>➕</Text>
+              <Ionicons name="add" size={40} color="#ffffff" />
             </LinearGradient>
             <Text style={styles.title}>Tambah Kegiatan</Text>
             <Text style={styles.subtitle}>Isi detail kegiatan sosial baru</Text>
@@ -111,7 +112,7 @@ export default function AddActivityScreen({ navigation }: any) {
           {fields.map((field, index) => (
             <View key={index} style={styles.inputGroup}>
               <View style={styles.labelRow}>
-                <Text style={styles.labelIcon}>{field.icon}</Text>
+                {field.icon}
                 <Text style={styles.label}>{field.label}</Text>
               </View>
               <View style={[styles.inputContainer, field.multiline && styles.inputContainerMultiline]}>
@@ -131,7 +132,7 @@ export default function AddActivityScreen({ navigation }: any) {
 
           {/* Tip Box */}
           <View style={styles.tipBox}>
-            <Text style={styles.tipIcon}>💡</Text>
+            <Ionicons name="bulb" size={24} color="#d97706" />
             <Text style={styles.tipText}>
               Pastikan tanggal sudah benar. Format harus: <Text style={styles.tipBold}>YYYY-MM-DD</Text>{'\n'}
               Contoh: <Text style={styles.tipBold}>2026-06-15</Text>
@@ -145,7 +146,7 @@ export default function AddActivityScreen({ navigation }: any) {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <>
-                  <Text style={styles.buttonIcon}>🚀</Text>
+                  <Ionicons name="rocket" size={20} color="#ffffff" style={{marginRight: 8}} />
                   <Text style={styles.buttonText}>Tambahkan Kegiatan</Text>
                 </>
               )}
@@ -185,7 +186,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 6,
   },
-  iconText: { fontSize: 36 },
   title: {
     fontSize: 28,
     fontWeight: '800',
@@ -205,7 +205,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     gap: 6,
   },
-  labelIcon: { fontSize: 16 },
   label: {
     fontSize: 14,
     fontWeight: '700',
@@ -246,7 +245,6 @@ const styles = StyleSheet.create({
     gap: 12,
     alignItems: 'flex-start',
   },
-  tipIcon: { fontSize: 20 },
   tipText: { flex: 1, fontSize: 13, color: '#92400e', lineHeight: 20 },
   tipBold: { fontWeight: '800' },
   button: {
@@ -255,7 +253,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10,
     shadowColor: '#059669',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
@@ -263,7 +260,6 @@ const styles = StyleSheet.create({
     elevation: 8,
     marginBottom: 14,
   },
-  buttonIcon: { fontSize: 20 },
   buttonText: {
     color: '#ffffff',
     fontSize: 17,
