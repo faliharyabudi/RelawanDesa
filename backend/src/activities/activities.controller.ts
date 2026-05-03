@@ -27,7 +27,7 @@ import { Role } from '@prisma/client';
 export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
-  // Admin: Upload foto
+  // Admin: Upload foto kegiatan
   @Roles(Role.ADMIN)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', {
@@ -40,6 +40,21 @@ export class ActivitiesController {
     })
   }))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
+    return { imageUrl: `/uploads/${file.filename}` };
+  }
+
+  // Semua user: Upload gambar umum (untuk foto profil, dll)
+  @Post('upload-image')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads',
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
+      }
+    })
+  }))
+  uploadImage(@UploadedFile() file: Express.Multer.File) {
     return { imageUrl: `/uploads/${file.filename}` };
   }
 

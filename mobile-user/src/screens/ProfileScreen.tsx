@@ -64,7 +64,7 @@ export default function ProfileScreen({ navigation }: any) {
           type,
         } as any);
 
-        const uploadRes = await api.post('/api/activities/upload', formData, {
+        const uploadRes = await api.post('/api/activities/upload-image', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
