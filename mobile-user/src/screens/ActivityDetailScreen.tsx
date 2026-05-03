@@ -13,21 +13,30 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [isJoined, setIsJoined] = useState(false);
   const [volunteerCount, setVolunteerCount] = useState<number>(activity._count?.volunteers || 0);
+  const [volunteersList, setVolunteersList] = useState<{user: {id: string, name: string}}[]>([]);
 
   useEffect(() => {
-    const checkJoinStatus = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get('/api/users/me/activities');
-        const myActivities: any[] = response.data;
+        // Cek status join
+        const responseMyActivities = await api.get('/api/users/me/activities');
+        const myActivities: any[] = responseMyActivities.data;
         const alreadyJoined = myActivities.some(a => a.activityId === activity.id);
         setIsJoined(alreadyJoined);
+
+        // Ambil detail activity (termasuk list volunteer)
+        const responseActivity = await api.get(`/api/activities/${activity.id}`);
+        if (responseActivity.data && responseActivity.data.volunteers) {
+          setVolunteersList(responseActivity.data.volunteers);
+          setVolunteerCount(responseActivity.data.volunteers.length);
+        }
       } catch (error) {
-        // Jika gagal cek, asumsikan belum join
+        // Error handling
       } finally {
         setCheckingStatus(false);
       }
     };
-    checkJoinStatus();
+    fetchData();
   }, []);
 
   const handleJoin = async () => {
@@ -175,6 +184,25 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
           <Text style={styles.descTitle}>Deskripsi Kegiatan</Text>
           <View style={styles.descCard}>
             <Text style={styles.descText}>{activity.description}</Text>
+          </View>
+        </View>
+
+        {/* Volunteers List */}
+        <View style={styles.descSection}>
+          <Text style={styles.descTitle}>Relawan yang Berpartisipasi ({volunteerCount})</Text>
+          <View style={styles.descCard}>
+            {volunteersList.length > 0 ? (
+              volunteersList.map((vol, index) => (
+                <View key={index} style={styles.volunteerItem}>
+                  <View style={styles.volunteerAvatar}>
+                    <Text style={styles.volunteerAvatarText}>{vol.user.name.charAt(0).toUpperCase()}</Text>
+                  </View>
+                  <Text style={styles.volunteerName}>{vol.user.name}</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.descText}>Belum ada relawan yang terdaftar. Jadilah yang pertama!</Text>
+            )}
           </View>
         </View>
 
@@ -331,6 +359,32 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#475569',
     lineHeight: 26,
+  },
+  volunteerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  volunteerAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#d1fae5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  volunteerAvatarText: {
+    color: '#059669',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  volunteerName: {
+    fontSize: 15,
+    color: '#334155',
+    fontWeight: '500',
   },
   footerOverlay: {
     position: 'absolute',
