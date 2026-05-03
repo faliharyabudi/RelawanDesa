@@ -278,8 +278,8 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
 
       {/* CTA Button */}
       <View style={styles.footerOverlay}>
-        {/* Tombol Hapus untuk Admin */}
-        {isAdmin && (
+        {isAdmin ? (
+          // Tombol Hapus untuk Admin
           <TouchableOpacity
             onPress={handleDelete}
             disabled={loading}
@@ -295,31 +295,30 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
               </>
             )}
           </TouchableOpacity>
-        )}
-
-        {/* Tombol Daftar/Batal untuk User biasa */}
-        {!isAdmin && (
-          checkingStatus ? (
-            <View style={styles.loadingBtn}>
-              <ActivityIndicator color="#10b981" />
-              <Text style={styles.loadingBtnText}>Memeriksa status...</Text>
+        ) : checkingStatus ? (
+          // Loading status
+          <View style={styles.loadingBtn}>
+            <ActivityIndicator color="#10b981" />
+            <Text style={styles.loadingBtnText}>Memeriksa status...</Text>
+          </View>
+        ) : isJoined ? (
+          // Batalkan pendaftaran
+          <TouchableOpacity onPress={handleUnjoin} disabled={loading} activeOpacity={0.85}>
+            <View style={styles.unjoinButton}>
+              {loading ? (
+                <ActivityIndicator color="#ef4444" />
+              ) : (
+                <>
+                  <Ionicons name="close-circle" size={20} color="#ef4444" style={{marginRight: 8}} />
+                  <Text style={styles.unjoinButtonText}>Batalkan Pendaftaran</Text>
+                </>
+              )}
             </View>
-          ) : isJoined ? (
-            <TouchableOpacity onPress={handleUnjoin} disabled={loading} activeOpacity={0.85}>
-              <View style={styles.unjoinButton}>
-                {loading ? (
-                  <ActivityIndicator color="#ef4444" />
-                ) : (
-                  <>
-                    <Ionicons name="close-circle" size={20} color="#ef4444" style={{marginRight: 8}} />
-                    <Text style={styles.unjoinButtonText}>Batalkan Pendaftaran</Text>
-                  </>
-                )}
-              </View>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity onPress={handleJoin} disabled={loading} activeOpacity={0.85}>
-              <LinearGradient colors={['#10b981', '#059669']} style={styles.joinButton}>
+          </TouchableOpacity>
+        ) : (
+          // Daftar sebagai relawan
+          <TouchableOpacity onPress={handleJoin} disabled={loading} activeOpacity={0.85}>
+            <LinearGradient colors={['#10b981', '#059669']} style={styles.joinButton}>
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
