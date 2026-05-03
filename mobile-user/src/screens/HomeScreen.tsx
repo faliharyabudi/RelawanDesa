@@ -13,8 +13,10 @@ export default function HomeScreen({ navigation }: any) {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const isAdmin = user?.role === 'ADMIN';
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
 
   const fetchActivities = async () => {
     try {
@@ -121,9 +123,29 @@ export default function HomeScreen({ navigation }: any) {
       </LinearGradient>
 
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Kegiatan Tersedia</Text>
-        <Text style={styles.sectionSubtitle}>Pilih dan daftarkan diri Anda</Text>
+        <View>
+          <Text style={styles.sectionTitle}>Kegiatan Tersedia</Text>
+          <Text style={styles.sectionSubtitle}>Pilih dan daftarkan diri Anda</Text>
+        </View>
+        {isAdmin && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('AddActivity')}
+            activeOpacity={0.85}
+          >
+            <LinearGradient colors={['#10b981', '#059669']} style={styles.addBtn}>
+              <Text style={styles.addBtnText}>＋ Tambah</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
       </View>
+
+      {/* Banner Admin */}
+      {isAdmin && (
+        <View style={styles.adminBanner}>
+          <Text style={styles.adminBannerIcon}>⭐</Text>
+          <Text style={styles.adminBannerText}>Mode Admin aktif — Anda bisa menambah dan mengelola kegiatan.</Text>
+        </View>
+      )}
 
       {loading ? (
         <View style={styles.center}>
@@ -242,6 +264,9 @@ const styles = StyleSheet.create({
   sectionHeader: {
     paddingHorizontal: 24,
     paddingVertical: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   sectionTitle: {
     fontSize: 22,
@@ -253,6 +278,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#64748b',
     marginTop: 2,
+  },
+  addBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  addBtnText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  adminBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fffbeb',
+    marginHorizontal: 20,
+    marginBottom: 16,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#fde68a',
+  },
+  adminBannerIcon: {
+    fontSize: 20,
+    marginRight: 10,
+  },
+  adminBannerText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#92400e',
+    lineHeight: 18,
   },
   list: {
     paddingHorizontal: 20,
