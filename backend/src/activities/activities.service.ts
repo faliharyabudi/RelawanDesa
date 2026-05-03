@@ -37,7 +37,7 @@ export class ActivitiesService {
         volunteers: {
           include: {
             user: {
-              select: { id: true, name: true }
+              select: { id: true, name: true, avatarUrl: true }
             }
           }
         }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  ActivityIndicator, Alert, ImageBackground, Linking
+  ActivityIndicator, Alert, ImageBackground, Linking, Image
 } from 'react-native';
 import api, { API_URL } from '../lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,7 +13,7 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [isJoined, setIsJoined] = useState(false);
   const [volunteerCount, setVolunteerCount] = useState<number>(activity._count?.volunteers || 0);
-  const [volunteersList, setVolunteersList] = useState<{user: {id: string, name: string}}[]>([]);
+  const [volunteersList, setVolunteersList] = useState<{user: {id: string, name: string, avatarUrl?: string}}[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -223,9 +223,16 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
             {volunteersList.length > 0 ? (
               volunteersList.map((vol, index) => (
                 <View key={index} style={styles.volunteerItem}>
-                  <View style={styles.volunteerAvatar}>
-                    <Text style={styles.volunteerAvatarText}>{vol.user.name.charAt(0).toUpperCase()}</Text>
-                  </View>
+                  {vol.user.avatarUrl ? (
+                    <Image
+                      source={{ uri: `${API_URL}${vol.user.avatarUrl}` }}
+                      style={styles.volunteerAvatarImg}
+                    />
+                  ) : (
+                    <View style={styles.volunteerAvatar}>
+                      <Text style={styles.volunteerAvatarText}>{vol.user.name.charAt(0).toUpperCase()}</Text>
+                    </View>
+                  )}
                   <Text style={styles.volunteerName}>{vol.user.name}</Text>
                 </View>
               ))
@@ -397,13 +404,21 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f1f5f9',
   },
   volunteerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#d1fae5',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+  },
+  volunteerAvatarImg: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+    borderWidth: 2,
+    borderColor: '#d1fae5',
   },
   volunteerAvatarText: {
     color: '#059669',
