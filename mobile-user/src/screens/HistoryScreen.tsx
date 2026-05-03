@@ -1,17 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View, Text, FlatList, StyleSheet, ActivityIndicator,
+  RefreshControl, Animated
+} from 'react-native';
 import api from '../lib/api';
 import { VolunteerActivity } from '../types';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function HistoryScreen() {
   const [history, setHistory] = useState<VolunteerActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
   const fetchHistory = async () => {
     try {
       const response = await api.get<VolunteerActivity[]>('/api/users/me/activities');
       setHistory(response.data);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }).start();
     } catch (error) {
       console.error('Failed to fetch history', error);
     } finally {
@@ -30,30 +41,60 @@ export default function HistoryScreen() {
   };
 
   const renderItem = ({ item }: { item: VolunteerActivity }) => (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{item.activity.title}</Text>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>Terdaftar</Text>
-        </View>
+    <Animated.View style={{ opacity: fadeAnim }}>
+      <View style={styles.card}>
+        <LinearGradient colors={['#ecfdf5', '#ffffff']} style={styles.cardGradient}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle} numberOfLines={2}>{item.activity.title}</Text>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>✅ Terdaftar</Text>
+            </View>
+          </View>
+          <View style={styles.cardFooter}>
+            <View style={styles.infoChip}>
+              <Text style={styles.infoIcon}>📅</Text>
+              <View>
+                <Text style={styles.infoLabel}>Tanggal Kegiatan</Text>
+                <Text style={styles.infoValue}>
+                  {new Date(item.activity.date).toLocaleDateString('id-ID', {
+                    day: 'numeric', month: 'long', year: 'numeric'
+                  })}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.infoChip}>
+              <Text style={styles.infoIcon}>🕒</Text>
+              <View>
+                <Text style={styles.infoLabel}>Tanggal Daftar</Text>
+                <Text style={styles.infoValue}>
+                  {new Date(item.joinedAt).toLocaleDateString('id-ID', {
+                    day: 'numeric', month: 'long', year: 'numeric'
+                  })}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </LinearGradient>
       </View>
-      <View style={styles.cardFooter}>
-        <Text style={styles.cardInfo}>📅 Kegiatan: {new Date(item.activity.date).toLocaleDateString('id-ID')}</Text>
-        <Text style={styles.cardInfo}>🕒 Daftar pada: {new Date(item.joinedAt).toLocaleDateString('id-ID')}</Text>
-      </View>
-    </View>
+    </Animated.View>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <LinearGradient colors={['#059669', '#10b981']} style={styles.header}>
+        <Text style={styles.headerLabel}>Histori Saya</Text>
         <Text style={styles.title}>Riwayat Relawan</Text>
-        <Text style={styles.subtitle}>Kegiatan yang Anda ikuti</Text>
-      </View>
+        <Text style={styles.subtitle}>Kegiatan sosial yang telah Anda ikuti</Text>
+        <View style={styles.statChip}>
+          <Text style={styles.statNum}>{history.length}</Text>
+          <Text style={styles.statLabel}>Total Kegiatan Diikuti</Text>
+        </View>
+      </LinearGradient>
 
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#10b981" />
+          <Text style={styles.loadingText}>Memuat riwayat...</Text>
         </View>
       ) : (
         <FlatList
@@ -67,8 +108,11 @@ export default function HistoryScreen() {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyEmoji}>🍃</Text>
-              <Text style={styles.emptyText}>Anda belum mengikuti kegiatan apa pun.</Text>
+              <Text style={styles.emptyEmoji}>🌿</Text>
+              <Text style={styles.emptyTitle}>Belum Ada Riwayat</Text>
+              <Text style={styles.emptyText}>
+                Anda belum pernah mendaftar ke kegiatan relawan. Yuk mulai berkontribusi!
+              </Text>
             </View>
           }
         />
@@ -80,98 +124,160 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#f0fdf4',
   },
   header: {
-    backgroundColor: '#10b981',
-    padding: 24,
+    paddingHorizontal: 24,
     paddingTop: 60,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    marginBottom: 16,
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    paddingBottom: 28,
+    borderBottomLeftRadius: 36,
+    borderBottomRightRadius: 36,
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 10,
+    marginBottom: 8,
+  },
+  headerLabel: {
+    fontSize: 13,
+    color: '#d1fae5',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 4,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '800',
     color: '#ffffff',
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 14,
-    color: '#d1fae5',
+    color: '#a7f3d0',
     marginTop: 4,
+    marginBottom: 20,
+    fontWeight: '500',
+  },
+  statChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 8,
+  },
+  statNum: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#ffffff',
+  },
+  statLabel: {
+    fontSize: 13,
+    color: '#d1fae5',
+    fontWeight: '600',
   },
   list: {
-    padding: 24,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 24,
   },
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 24,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 2,
+    elevation: 3,
+    overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: '#d1fae5',
+  },
+  cardGradient: {
+    padding: 20,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 16,
+    gap: 12,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#064e3b',
     flex: 1,
-    marginRight: 12,
+    lineHeight: 24,
   },
   badge: {
-    backgroundColor: '#ecfdf5',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: '#059669',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
   badgeText: {
-    color: '#059669',
+    color: '#ffffff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   cardFooter: {
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-    paddingTop: 12,
-    gap: 4,
+    borderTopColor: '#d1fae5',
+    paddingTop: 14,
+    gap: 12,
   },
-  cardInfo: {
-    fontSize: 13,
-    color: '#475569',
+  infoChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  infoIcon: {
+    fontSize: 20,
+  },
+  infoLabel: {
+    fontSize: 12,
+    color: '#64748b',
     fontWeight: '500',
+  },
+  infoValue: {
+    fontSize: 14,
+    color: '#064e3b',
+    fontWeight: '700',
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 12,
+  },
+  loadingText: {
+    color: '#64748b',
+    fontSize: 14,
   },
   emptyContainer: {
+    paddingVertical: 60,
     alignItems: 'center',
-    marginTop: 60,
+    paddingHorizontal: 32,
   },
   emptyEmoji: {
-    fontSize: 48,
+    fontSize: 56,
     marginBottom: 16,
   },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#0f172a',
+    marginBottom: 8,
+  },
   emptyText: {
-    textAlign: 'center',
     color: '#94a3b8',
-    fontSize: 16,
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
