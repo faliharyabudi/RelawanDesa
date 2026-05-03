@@ -4,6 +4,7 @@ import {
   ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Image
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 import api, { API_URL } from '../lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,9 +14,11 @@ export default function AddActivityScreen({ navigation }: any) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
+  const [locationCoords, setLocationCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [date, setDate] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingGps, setLoadingGps] = useState(false);
 
   // Validasi format tanggal sederhana: YYYY-MM-DD
   const isValidDate = (dateStr: string) => {
@@ -41,6 +44,30 @@ export default function AddActivityScreen({ navigation }: any) {
 
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const handlePickLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Izin Ditolak', 'Kami butuh izin akses GPS untuk mendapatkan lokasi Anda.');
+      return;
+    }
+    setLoadingGps(true);
+    try {
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+      const { latitude, longitude } = pos.coords;
+      setLocationCoords({ lat: latitude, lng: longitude });
+      // Reverse geocode untuk nama lokasi
+      const [place] = await Location.reverseGeocodeAsync({ latitude, longitude });
+      const name = [place.name, place.street, place.subregion, place.city, place.region]
+        .filter(Boolean)
+        .join(', ');
+      setLocation(name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+    } catch {
+      Alert.alert('Error', 'Gagal mendapatkan lokasi GPS.');
+    } finally {
+      setLoadingGps(false);
     }
   };
 
@@ -84,7 +111,9 @@ export default function AddActivityScreen({ navigation }: any) {
       await api.post('/api/activities', {
         title: title.trim(),
         description: description.trim(),
-        location: location.trim(),
+        location: locationCoords
+          ? `https://maps.google.com/?q=${locationCoords.lat},${locationCoords.lng}`
+          : location.trim(),
         date: new Date(date.trim()).toISOString(),
         ...(uploadedImageUrl ? { imageUrl: uploadedImageUrl } : {}),
       });
@@ -122,14 +151,6 @@ export default function AddActivityScreen({ navigation }: any) {
       value: description,
       onChangeText: setDescription,
       multiline: true,
-    },
-    {
-      icon: <Ionicons name="location" size={18} color="#0f172a" />,
-      label: 'Lokasi',
-      placeholder: 'Contoh: Balai Desa Sukamaju',
-      value: location,
-      onChangeText: setLocation,
-      multiline: false,
     },
     {
       icon: <Ionicons name="calendar" size={18} color="#0f172a" />,
@@ -197,6 +218,37 @@ export default function AddActivityScreen({ navigation }: any) {
               </View>
             </View>
           ))}
+
+          {/* Location Picker */}
+          <View style={styles.inputGroup}>
+            <View style={styles.labelRow}>
+              <Ionicons name="location" size={18} color="#0f172a" />
+              <Text style={styles.label}>Lokasi Kegiatan</Text>
+            </View>
+            <View style={styles.locationBox}>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                placeholder="Nama tempat atau tekan ikon GPS"
+                placeholderTextColor="#94a3b8"
+                value={location}
+                onChangeText={(text) => { setLocation(text); setLocationCoords(null); }}
+              />
+              <TouchableOpacity
+                style={styles.gpsBtn}
+                onPress={handlePickLocation}
+                disabled={loadingGps}
+              >
+                {loadingGps ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Ionicons name="navigate" size={20} color="#fff" />
+                )}
+              </TouchableOpacity>
+            </View>
+            {locationCoords && (
+              <Text style={styles.coordsText}>📍 {locationCoords.lat.toFixed(6)}, {locationCoords.lng.toFixed(6)} (Titik GPS)</Text>
+            )}
+          </View>
 
           {/* Tip Box */}
           <View style={styles.tipBox}>
@@ -326,6 +378,30 @@ const styles = StyleSheet.create({
     marginTop: 8,
     color: '#94a3b8',
     fontSize: 14,
+    fontWeight: '500',
+  },
+  locationBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    borderWidth: 1.5,
+    borderColor: '#e2e8f0',
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  gpsBtn: {
+    backgroundColor: '#059669',
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  coordsText: {
+    marginTop: 6,
+    fontSize: 12,
+    color: '#059669',
     fontWeight: '500',
   },
   tipBox: {

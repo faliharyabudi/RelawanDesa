@@ -31,15 +31,17 @@ export class UsersController {
   @Get('me')
   getMe(@CurrentUser('userId') userId: string) {
     return this.usersService.getMe(userId);
-  }
-
-  // User: update nama profil sendiri
-  @Put('me/name')
-  updateMyName(
+  // User: update profil sendiri
+  @Put('me/profile')
+  updateMyProfile(
     @CurrentUser('userId') userId: string,
-    @Body('name') name: string,
+    @Body('name') name?: string,
+    @Body('avatarUrl') avatarUrl?: string,
   ) {
-    return this.usersService.update(userId, { name });
+    const data: any = {};
+    if (name !== undefined) data.name = name;
+    if (avatarUrl !== undefined) data.avatarUrl = avatarUrl;
+    return this.usersService.update(userId, data);
   }
 
   // User: lihat riwayat kegiatan sendiri

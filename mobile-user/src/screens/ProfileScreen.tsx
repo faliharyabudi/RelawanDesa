@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal, TextInput, ActivityIndicator, Image } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import api from '../lib/api';
+import * as ImagePicker from 'expo-image-picker';
+import api, { API_URL } from '../lib/api';
 
 export default function ProfileScreen({ navigation }: any) {
   const { user, logout, updateUser } = useAuth();
@@ -21,7 +22,7 @@ export default function ProfileScreen({ navigation }: any) {
     
     setIsUpdatingName(true);
     try {
-      await api.put('/api/users/me/name', { name: newName.trim() });
+      await api.put('/api/users/me/profile', { name: newName.trim() });
       await updateUser({ name: newName.trim() });
       setEditNameModalVisible(false);
       Alert.alert('Berhasil', 'Nama Anda telah diperbarui.');
@@ -30,6 +31,55 @@ export default function ProfileScreen({ navigation }: any) {
       Alert.alert('Error', 'Gagal memperbarui nama');
     } finally {
       setIsUpdatingName(false);
+    }
+  };
+
+  const handlePickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert('Izin Ditolak', 'Anda perlu memberikan izin untuk mengakses galeri.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled && result.assets[0].uri) {
+      setLoading(true);
+      try {
+        const imageUri = result.assets[0].uri;
+        const formData = new FormData();
+        const filename = imageUri.split('/').pop() || 'profile.jpg';
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image/jpeg`;
+
+        formData.append('file', {
+          uri: imageUri,
+          name: filename,
+          type,
+        } as any);
+
+        const uploadRes = await api.post('/api/activities/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        
+        const avatarUrl = uploadRes.data.imageUrl;
+        await api.put('/api/users/me/profile', { avatarUrl });
+        await updateUser({ avatarUrl });
+        Alert.alert('Berhasil', 'Foto profil berhasil diperbarui!');
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Error', 'Gagal mengupload foto profil.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -62,14 +112,21 @@ export default function ProfileScreen({ navigation }: any) {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header Profile */}
         <LinearGradient colors={['#059669', '#34d399']} style={styles.header}>
-          <View style={styles.avatarContainer}>
-            <LinearGradient colors={['#ffffff', '#f8fafc']} style={styles.avatar}>
-              <Text style={styles.avatarText}>{user?.name?.charAt(0).toUpperCase()}</Text>
-            </LinearGradient>
+          <TouchableOpacity style={styles.avatarContainer} onPress={handlePickImage} disabled={loading}>
+            {user?.avatarUrl ? (
+              <Image source={{ uri: `${API_URL}${user.avatarUrl}` }} style={[styles.avatar, { padding: 0 }]} />
+            ) : (
+              <LinearGradient colors={['#ffffff', '#f8fafc']} style={styles.avatar}>
+                <Text style={styles.avatarText}>{user?.name?.charAt(0).toUpperCase()}</Text>
+              </LinearGradient>
+            )}
             <View style={styles.badgeRole}>
               <Text style={styles.badgeRoleText}>{user?.role || 'REL'}</Text>
             </View>
-          </View>
+            <View style={styles.editAvatarBadge}>
+              <Ionicons name="camera" size={14} color="#fff" />
+            </View>
+          </TouchableOpacity>
           <Text style={styles.name}>{user?.name}</Text>
           <Text style={styles.email}>{user?.email}</Text>
         </LinearGradient>
@@ -233,6 +290,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 10,
     elevation: 6,
+    overflow: 'hidden',
+  },
+  editAvatarBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: -4,
+    backgroundColor: '#0f172a',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#059669',
   },
   avatarText: {
     fontSize: 40,
