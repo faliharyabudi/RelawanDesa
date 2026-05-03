@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Image } from 'react-native';
+import {
+  View, Text, ScrollView, TouchableOpacity, StyleSheet,
+  ActivityIndicator, Alert
+} from 'react-native';
 import api from '../lib/api';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function ActivityDetailScreen({ route, navigation }: any) {
   const { activity } = route.params;
@@ -33,75 +37,77 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
     );
   };
 
+  const infoItems = [
+    {
+      icon: '📅',
+      label: 'Tanggal Pelaksanaan',
+      value: new Date(activity.date).toLocaleDateString('id-ID', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      })
+    },
+    { icon: '📍', label: 'Lokasi Kegiatan', value: activity.location },
+    { icon: '👥', label: 'Total Relawan', value: `${activity._count?.volunteers || 0} Orang Terdaftar` },
+  ];
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.imagePlaceholderText}>📸</Text>
+        {/* Hero Section */}
+        <LinearGradient colors={['#059669', '#34d399']} style={styles.hero}>
+          <View style={styles.heroBadge}>
+            <Text style={styles.heroBadgeText}>🌿 Aksi Sosial</Text>
+          </View>
+          <Text style={styles.heroTitle}>{activity.title}</Text>
+          <View style={styles.heroVolunteer}>
+            <Text style={styles.heroVolunteerText}>
+              👥 {activity._count?.volunteers || 0} relawan sudah bergabung
+            </Text>
+          </View>
+        </LinearGradient>
+
+        {/* Info Cards */}
+        <View style={styles.infoSection}>
+          {infoItems.map((item, index) => (
+            <View key={index} style={styles.infoCard}>
+              <View style={styles.infoIconBox}>
+                <Text style={styles.infoIconText}>{item.icon}</Text>
+              </View>
+              <View style={styles.infoContent}>
+                <Text style={styles.infoLabel}>{item.label}</Text>
+                <Text style={styles.infoValue}>{item.value}</Text>
+              </View>
+            </View>
+          ))}
         </View>
 
-        <View style={styles.header}>
-          <View style={styles.badgeContainer}>
-            <Text style={styles.badgeText}>Aksi Sosial</Text>
-          </View>
-          <Text style={styles.title}>{activity.title}</Text>
-          
-          <View style={styles.infoCard}>
-            <View style={styles.infoRow}>
-              <View style={styles.iconBox}>
-                <Text style={styles.infoIcon}>📅</Text>
-              </View>
-              <View>
-                <Text style={styles.infoLabel}>Tanggal Pelaksanaan</Text>
-                <Text style={styles.infoText}>{new Date(activity.date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</Text>
-              </View>
-            </View>
-            
-            <View style={styles.divider} />
-            
-            <View style={styles.infoRow}>
-              <View style={styles.iconBox}>
-                <Text style={styles.infoIcon}>📍</Text>
-              </View>
-              <View>
-                <Text style={styles.infoLabel}>Lokasi Kegiatan</Text>
-                <Text style={styles.infoText}>{activity.location}</Text>
-              </View>
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.infoRow}>
-              <View style={styles.iconBox}>
-                <Text style={styles.infoIcon}>👥</Text>
-              </View>
-              <View>
-                <Text style={styles.infoLabel}>Total Relawan</Text>
-                <Text style={styles.infoText}>{activity._count?.volunteers || 0} Orang Terdaftar</Text>
-              </View>
-            </View>
+        {/* Description */}
+        <View style={styles.descSection}>
+          <Text style={styles.descTitle}>Deskripsi Kegiatan</Text>
+          <View style={styles.descCard}>
+            <Text style={styles.descText}>{activity.description}</Text>
           </View>
         </View>
 
-        <View style={styles.content}>
-          <Text style={styles.sectionTitle}>Deskripsi Kegiatan</Text>
-          <Text style={styles.description}>{activity.description}</Text>
-        </View>
-        <View style={{height: 100}} />
+        <View style={{ height: 110 }} />
       </ScrollView>
 
+      {/* CTA Button */}
       <View style={styles.footerOverlay}>
-        <TouchableOpacity 
-          style={styles.joinButton} 
+        <TouchableOpacity
           onPress={handleJoin}
           disabled={loading}
-          activeOpacity={0.8}
+          activeOpacity={0.85}
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.joinButtonText}>Daftar Sebagai Relawan</Text>
-          )}
+          <LinearGradient colors={['#10b981', '#059669']} style={styles.joinButton}>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <>
+                <Text style={styles.joinButtonIcon}>🤝</Text>
+                <Text style={styles.joinButtonText}>Daftar Sebagai Relawan</Text>
+              </>
+            )}
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </View>
@@ -111,140 +117,152 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#f0fdf4',
   },
-  imagePlaceholder: {
-    width: '100%',
-    height: 250,
-    backgroundColor: '#d1fae5',
-    justifyContent: 'center',
-    alignItems: 'center',
+  hero: {
+    padding: 28,
+    paddingTop: 32,
+    paddingBottom: 48,
   },
-  imagePlaceholderText: {
-    fontSize: 50,
-    opacity: 0.5,
-  },
-  header: {
-    backgroundColor: '#ffffff',
-    padding: 24,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    marginTop: -30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  badgeContainer: {
-    backgroundColor: '#ecfdf5',
+  heroBadge: {
+    backgroundColor: 'rgba(255,255,255,0.25)',
     alignSelf: 'flex-start',
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: 20,
     marginBottom: 16,
   },
-  badgeText: {
-    color: '#059669',
+  heroBadgeText: {
+    color: '#ffffff',
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: 13,
   },
-  title: {
+  heroTitle: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#0f172a',
-    marginBottom: 24,
+    color: '#ffffff',
     lineHeight: 34,
+    marginBottom: 16,
+    letterSpacing: -0.5,
+  },
+  heroVolunteer: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+  heroVolunteerText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  infoSection: {
+    paddingHorizontal: 20,
+    marginTop: -24,
+    gap: 12,
   },
   infoCard: {
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#ffffff',
     borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  infoRow: {
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#d1fae5',
+    gap: 14,
   },
-  iconBox: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+  infoIconBox: {
+    width: 48,
+    height: 48,
+    backgroundColor: '#ecfdf5',
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
-  infoIcon: {
-    fontSize: 18,
+  infoIconText: {
+    fontSize: 22,
+  },
+  infoContent: {
+    flex: 1,
   },
   infoLabel: {
     fontSize: 12,
     color: '#64748b',
-    marginBottom: 2,
-  },
-  infoText: {
-    fontSize: 15,
-    color: '#1e293b',
     fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#e2e8f0',
-    marginVertical: 16,
+  infoValue: {
+    fontSize: 15,
+    color: '#064e3b',
+    fontWeight: '700',
+    lineHeight: 22,
   },
-  content: {
-    padding: 24,
-    backgroundColor: '#ffffff',
-    marginTop: 8,
+  descSection: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
   },
-  sectionTitle: {
+  descTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
+    fontWeight: '800',
+    color: '#0f172a',
     marginBottom: 12,
   },
-  description: {
+  descCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#d1fae5',
+  },
+  descText: {
     fontSize: 15,
     color: '#475569',
-    lineHeight: 26,
+    lineHeight: 28,
   },
   footerOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#ffffff',
-    padding: 24,
-    paddingTop: 16,
+    backgroundColor: 'rgba(240,253,244,0.95)',
+    padding: 20,
+    paddingBottom: 28,
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 8,
+    borderTopColor: '#d1fae5',
   },
   joinButton: {
-    backgroundColor: '#10b981',
-    padding: 18,
-    borderRadius: 20,
+    padding: 20,
+    borderRadius: 22,
     alignItems: 'center',
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  joinButtonIcon: {
+    fontSize: 20,
   },
   joinButtonText: {
     color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '800',
+    letterSpacing: 0.3,
   },
 });
