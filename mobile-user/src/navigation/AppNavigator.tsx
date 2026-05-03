@@ -20,41 +20,42 @@ function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#10b981',
+        tabBarActiveTintColor: '#059669',
         tabBarInactiveTintColor: '#94a3b8',
         tabBarStyle: {
           backgroundColor: '#ffffff',
-          borderTopColor: '#f1f5f9',
-          borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
+          borderTopColor: '#d1fae5',
+          borderTopWidth: 1.5,
+          height: 68,
+          paddingBottom: 10,
           paddingTop: 8,
-          elevation: 8,
-          shadowColor: '#000',
+          elevation: 16,
+          shadowColor: '#059669',
           shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.05,
-          shadowRadius: 8,
+          shadowOpacity: 0.1,
+          shadowRadius: 12,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
+          fontSize: 11,
+          fontWeight: '700',
+          letterSpacing: 0.2,
         }
       }}
     >
-      <Tab.Screen 
-        name="Beranda" 
-        component={HomeScreen} 
-        options={{ tabBarIcon: () => <Text style={{ fontSize: 20 }}>🏡</Text> }}
+      <Tab.Screen
+        name="Beranda"
+        component={HomeScreen}
+        options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🏡</Text> }}
       />
-      <Tab.Screen 
-        name="Riwayat" 
-        component={HistoryScreen} 
-        options={{ tabBarIcon: () => <Text style={{ fontSize: 20 }}>📋</Text> }}
+      <Tab.Screen
+        name="Riwayat"
+        component={HistoryScreen}
+        options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>📋</Text> }}
       />
-      <Tab.Screen 
-        name="Profil" 
-        component={ProfileScreen} 
-        options={{ tabBarIcon: () => <Text style={{ fontSize: 20 }}>👤</Text> }}
+      <Tab.Screen
+        name="Profil"
+        component={ProfileScreen}
+        options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>👤</Text> }}
       />
     </Tab.Navigator>
   );
@@ -67,25 +68,24 @@ export default function AppNavigator() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!user ? (
-          // Auth Stack
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
           </>
         ) : (
-          // Main App Stack
           <>
             <Stack.Screen name="MainTabs" component={MainTabNavigator} />
-            <Stack.Screen 
-              name="ActivityDetail" 
-              component={ActivityDetailScreen} 
-              options={{ 
-                headerShown: true, 
+            <Stack.Screen
+              name="ActivityDetail"
+              component={ActivityDetailScreen}
+              options={{
+                headerShown: true,
                 title: 'Detail Kegiatan',
-                headerStyle: { backgroundColor: '#ffffff' },
-                headerTintColor: '#0f172a',
+                headerStyle: { backgroundColor: '#059669' },
+                headerTintColor: '#ffffff',
+                headerTitleStyle: { fontWeight: '800', fontSize: 18 },
                 headerShadowVisible: false,
-              }} 
+              }}
             />
           </>
         )}
