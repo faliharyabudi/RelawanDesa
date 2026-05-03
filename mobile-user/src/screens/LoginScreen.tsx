@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Animated } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Animated, Image } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -59,9 +59,13 @@ export default function LoginScreen({ navigation }: any) {
       >
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-            <LinearGradient colors={['#34d399', '#059669']} style={styles.logoContainer}>
-              <Text style={styles.logoText}>🍃</Text>
-            </LinearGradient>
+            <View style={styles.logoContainer}>
+              <Image 
+                source={require('../../assets/logo.jpeg')} 
+                style={styles.logoImage} 
+                resizeMode="cover"
+              />
+            </View>
             <Text style={styles.title}>Selamat Datang</Text>
             <Text style={styles.subtitle}>Masuk ke portal RelawanDesa Anda</Text>
           </Animated.View>
@@ -137,20 +141,22 @@ const styles = StyleSheet.create({
     marginBottom: 48,
   },
   logoContainer: {
-    width: 88,
-    height: 88,
-    borderRadius: 28,
+    width: 90,
+    height: 90,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
-    shadowColor: '#10b981',
+    marginBottom: 20,
+    shadowColor: '#059669',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
+    shadowOpacity: 0.35,
+    shadowRadius: 15,
     elevation: 8,
+    overflow: 'hidden',
   },
-  logoText: {
-    fontSize: 44,
+  logoImage: {
+    width: '100%',
+    height: '100%',
   },
   title: {
     fontSize: 32,
