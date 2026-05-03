@@ -62,11 +62,38 @@ export class UsersService {
     return { message: 'User berhasil dihapus' };
   }
 
+  async getMe(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        _count: { select: { volunteers: true } },
+      },
+    });
+    if (!user) throw new NotFoundException('User tidak ditemukan');
+    return user;
+  }
+
   async getMyActivities(userId: string) {
     return this.prisma.volunteerActivity.findMany({
       where: { userId },
       include: { activity: true },
       orderBy: { joinedAt: 'desc' },
     });
+  }
+
+  async unjoinActivity(userId: string, activityId: string) {
+    const record = await this.prisma.volunteerActivity.findUnique({
+      where: { userId_activityId: { userId, activityId } },
+    });
+    if (!record) throw new NotFoundException('Anda belum terdaftar di kegiatan ini');
+    await this.prisma.volunteerActivity.delete({
+      where: { userId_activityId: { userId, activityId } },
+    });
+    return { message: 'Berhasil keluar dari kegiatan' };
   }
 }

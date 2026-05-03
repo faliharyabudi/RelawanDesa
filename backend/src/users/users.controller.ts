@@ -27,9 +27,30 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  // User: lihat profil sendiri
+  @Get('me')
+  getMe(@CurrentUser('userId') userId: string) {
+    return this.usersService.getMe(userId);
+  }
+
   // User: lihat riwayat kegiatan sendiri
-  @Get('activities')
+  @Get('me/activities')
   getMyActivities(@CurrentUser('userId') userId: string) {
+    return this.usersService.getMyActivities(userId);
+  }
+
+  // User: keluar dari kegiatan (unjoin)
+  @Delete('me/activities/:activityId')
+  unjoinActivity(
+    @Param('activityId') activityId: string,
+    @CurrentUser('userId') userId: string,
+  ) {
+    return this.usersService.unjoinActivity(userId, activityId);
+  }
+
+  // (legacy) User: lihat riwayat kegiatan sendiri
+  @Get('activities')
+  getMyActivitiesLegacy(@CurrentUser('userId') userId: string) {
     return this.usersService.getMyActivities(userId);
   }
 
