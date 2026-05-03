@@ -34,6 +34,13 @@ export class ActivitiesService {
       where: { id },
       include: {
         _count: { select: { volunteers: true } },
+        volunteers: {
+          include: {
+            user: {
+              select: { id: true, name: true }
+            }
+          }
+        }
       },
     });
     if (!activity) throw new NotFoundException('Kegiatan tidak ditemukan');
