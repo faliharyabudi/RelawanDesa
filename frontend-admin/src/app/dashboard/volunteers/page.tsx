@@ -47,7 +47,7 @@ export default function VolunteersPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-800">Monitoring Relawan</h1>
-        <p className="text-slate-500 mt-1">Pantau partisipasi relawan di setiap kegiatan sosial</p>
+        <p className="text-slate-500 mt-1">Pantau partisipasi relawan di setiap kegiatan sosial Masyarakat</p>
       </div>
 
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6">
