@@ -16,7 +16,7 @@ export default function LoginPage() {
     try {
       await login(email, password);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Login gagal');
+      setError(err instanceof Error ? err.message : 'LogIn Gagal');
     } finally {
       setLoading(false);
     }
