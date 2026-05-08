@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
@@ -17,6 +18,8 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function MainTabNavigator() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -27,8 +30,8 @@ function MainTabNavigator() {
           backgroundColor: '#ffffff',
           borderTopColor: '#d1fae5',
           borderTopWidth: 1.5,
-          height: 68,
-          paddingBottom: 10,
+          height: 68 + insets.bottom,
+          paddingBottom: 10 + insets.bottom,
           paddingTop: 8,
           elevation: 16,
           shadowColor: '#059669',
@@ -46,22 +49,22 @@ function MainTabNavigator() {
       <Tab.Screen
         name="Beranda"
         component={HomeScreen}
-        options={{ 
-          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={24} color={color} /> 
+        options={{
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={24} color={color} />
         }}
       />
       <Tab.Screen
         name="Riwayat"
         component={HistoryScreen}
-        options={{ 
-          tabBarIcon: ({ color, size }) => <Ionicons name="time" size={24} color={color} /> 
+        options={{
+          tabBarIcon: ({ color, size }) => <Ionicons name="time" size={24} color={color} />
         }}
       />
       <Tab.Screen
         name="Profil"
         component={ProfileScreen}
-        options={{ 
-          tabBarIcon: ({ color, size }) => <Ionicons name="person" size={24} color={color} /> 
+        options={{
+          tabBarIcon: ({ color, size }) => <Ionicons name="person" size={24} color={color} />
         }}
       />
     </Tab.Navigator>
