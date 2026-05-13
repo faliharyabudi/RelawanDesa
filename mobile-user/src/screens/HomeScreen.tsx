@@ -17,8 +17,8 @@ export default function HomeScreen({ navigation }: any) {
   const isAdmin = user?.role === 'ADMIN';
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredActivities = activities.filter(activity => 
-    activity.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredActivities = activities.filter(activity =>
+    activity.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (activity.location && activity.location.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
@@ -72,10 +72,10 @@ export default function HomeScreen({ navigation }: any) {
               </Text>
             </View>
           </View>
-          
+
           <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
           <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
-          
+
           <View style={styles.cardFooter}>
             <View style={styles.footerItem}>
               <Ionicons name="calendar-outline" size={14} color="#64748b" />
@@ -103,7 +103,7 @@ export default function HomeScreen({ navigation }: any) {
           <View>
             <Text style={styles.greetingSmall}>Halo,</Text>
             <Text style={styles.greeting}>{user?.name?.split(' ')[0]} <Ionicons name="hand-left" size={24} color="#fcd34d" /></Text>
-            <Text style={styles.subtitle}>Mari buat perubahan hari ini!</Text>
+            <Text style={styles.subtitle}>Mari buat perubahan untuk hari ini !</Text>
           </View>
           <View style={styles.avatarMini}>
             <Text style={styles.avatarMiniText}>{user?.name?.charAt(0).toUpperCase()}</Text>
@@ -158,7 +158,7 @@ export default function HomeScreen({ navigation }: any) {
             activeOpacity={0.85}
           >
             <LinearGradient colors={['#10b981', '#059669']} style={styles.addBtn}>
-              <Ionicons name="add" size={16} color="#ffffff" style={{marginRight: 4}} />
+              <Ionicons name="add" size={16} color="#ffffff" style={{ marginRight: 4 }} />
               <Text style={styles.addBtnText}>Tambah</Text>
             </LinearGradient>
           </TouchableOpacity>
