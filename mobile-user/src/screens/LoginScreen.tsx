@@ -9,7 +9,7 @@ export default function LoginScreen({ navigation }: any) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-  
+
   // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
@@ -53,21 +53,21 @@ export default function LoginScreen({ navigation }: any) {
 
   return (
     <LinearGradient colors={['#ffffff', '#f0fdf4']} style={styles.container}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
             <View style={styles.logoContainer}>
-              <Image 
-                source={require('../../assets/logo.png')} 
-                style={styles.logoImage} 
+              <Image
+                source={require('../../assets/logo.png')}
+                style={styles.logoImage}
                 resizeMode="cover"
               />
             </View>
             <Text style={styles.title}>Selamat Datang</Text>
-            <Text style={styles.subtitle}>Masuk ke portal RelawanDesa Anda</Text>
+            <Text style={styles.subtitle}>Masuk ke portal RelawanDesa Anda !</Text>
           </Animated.View>
 
           <Animated.View style={[styles.form, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
@@ -100,7 +100,7 @@ export default function LoginScreen({ navigation }: any) {
               </View>
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={handleLogin}
               disabled={loading}
               activeOpacity={0.8}
