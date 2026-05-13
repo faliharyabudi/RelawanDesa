@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
-  ActivityIndicator, RefreshControl, Animated, Image
+  ActivityIndicator, RefreshControl, Animated, Image, TextInput
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import api, { API_URL } from '../lib/api';
@@ -15,6 +15,12 @@ export default function HomeScreen({ navigation }: any) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const isAdmin = user?.role === 'ADMIN';
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredActivities = activities.filter(activity => 
+    activity.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (activity.location && activity.location.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -125,6 +131,22 @@ export default function HomeScreen({ navigation }: any) {
         </View>
       </LinearGradient>
 
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color="#94a3b8" style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Cari kegiatan atau lokasi..."
+          placeholderTextColor="#94a3b8"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={20} color="#cbd5e1" />
+          </TouchableOpacity>
+        )}
+      </View>
+
       <View style={styles.sectionHeader}>
         <View>
           <Text style={styles.sectionTitle}>Kegiatan Tersedia</Text>
@@ -158,7 +180,7 @@ export default function HomeScreen({ navigation }: any) {
         </View>
       ) : (
         <FlatList
-          data={activities}
+          data={filteredActivities}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.list}
@@ -265,6 +287,33 @@ const styles = StyleSheet.create({
     width: 1,
     height: 30,
     backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    marginHorizontal: 24,
+    marginTop: 24,
+    marginBottom: -4,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 16,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: '#0f172a',
+    padding: 0,
   },
   sectionHeader: {
     paddingHorizontal: 24,
