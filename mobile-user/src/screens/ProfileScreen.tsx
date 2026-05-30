@@ -16,7 +16,7 @@ export default function ProfileScreen({ navigation }: any) {
 
   const handleUpdateName = async () => {
     if (!newName.trim()) {
-      Alert.alert('PERHATIAN!', 'Nama tidak boleh kosong');
+      Alert.alert('PERHATIAN!', 'Nama tidak boleh kosong !!');
       return;
     }
 
