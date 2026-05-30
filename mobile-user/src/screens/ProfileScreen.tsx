@@ -28,7 +28,7 @@ export default function ProfileScreen({ navigation }: any) {
       Alert.alert('Berhasil', 'Nama Anda telah diperbarui.');
     } catch (error) {
       console.error(error);
-      Alert.alert('Error!', 'Gagal memperbarui nama');
+      Alert.alert('Error!', 'Gagal memperbarui nama anda');
     } finally {
       setIsUpdatingName(false);
     }
