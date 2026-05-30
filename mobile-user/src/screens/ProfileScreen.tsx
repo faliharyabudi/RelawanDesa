@@ -76,7 +76,7 @@ export default function ProfileScreen({ navigation }: any) {
         Alert.alert('Berhasil', 'Foto profil berhasil diperbarui!');
       } catch (error) {
         console.error(error);
-        Alert.alert('Error', 'Gagal mengupload foto profil.');
+        Alert.alert('Error!', 'Gagal mengupload foto profil.');
       } finally {
         setLoading(false);
       }
