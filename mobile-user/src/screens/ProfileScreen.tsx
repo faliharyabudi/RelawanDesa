@@ -1,8 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { useAuth } from '../contexts/AuthContext';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { API_URL } from '../lib/api';
 
 export default function ProfileScreen({ navigation }: any) {
-  // Tempat menaruh hooks dan state di kemudian hari (contoh: const { user, logout } = useAuth())
+  const { user } = useAuth();
 
   const handleLogout = () => {
     // Fungsi logout akan ditaruh di sini
@@ -13,14 +17,46 @@ export default function ProfileScreen({ navigation }: any) {
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         
-        {/* 1. Header Profile */}
-        <View style={styles.headerSection}>
-          <View style={styles.avatarPlaceholder}>
-            <Text style={styles.avatarText}>U</Text>
+        {/* 1. Header Profile (Desain Modern Ala Gojek / Kitabisa) */}
+        <LinearGradient 
+          colors={['#059669', '#10b981']} 
+          start={{ x: 0, y: 0 }} 
+          end={{ x: 1, y: 1 }} 
+          style={styles.headerSection}
+        >
+          {/* Avatar Container */}
+          <View style={styles.avatarContainer}>
+            {user?.avatarUrl ? (
+              <Image source={{ uri: `${API_URL}${user.avatarUrl}` }} style={styles.avatarImage} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Text style={styles.avatarText}>
+                  {user?.name?.charAt(0).toUpperCase() || 'A'}
+                </Text>
+              </View>
+            )}
+            {/* Verified Badge */}
+            <View style={styles.verifiedBadge}>
+              <Ionicons name="shield-checkmark" size={12} color="#ffffff" />
+            </View>
           </View>
-          <Text style={styles.userName}>Nama Pengguna</Text>
-          <Text style={styles.userEmail}>email@domain.com</Text>
-        </View>
+
+          {/* Nama Pengguna & Checkmark Verified */}
+          <View style={styles.nameRow}>
+            <Text style={styles.userName}>{user?.name || 'Administrator'}</Text>
+            <Ionicons name="checkmark-circle" size={18} color="#38bdf8" />
+          </View>
+          
+          {/* Email Pengguna */}
+          <Text style={styles.userEmail}>{user?.email || 'admin@relawandesa.id'}</Text>
+
+          {/* Role Badge with conditional colors */}
+          <View style={[styles.roleBadge, user?.role === 'ADMIN' ? styles.roleBadgeAdmin : styles.roleBadgeVolunteer]}>
+            <Text style={styles.roleBadgeText}>
+              {user?.role === 'ADMIN' ? 'Administrator' : 'Relawan'}
+            </Text>
+          </View>
+        </LinearGradient>
 
         {/* 2. Statistik Pengguna */}
         <View style={styles.sectionContainer}>
@@ -108,36 +144,101 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   headerSection: {
-    backgroundColor: '#059669',
-    paddingTop: 60,
-    paddingBottom: 30,
+    paddingTop: 65,
+    paddingBottom: 40,
     alignItems: 'center',
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+    borderBottomLeftRadius: 36,
+    borderBottomRightRadius: 36,
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  avatarContainer: {
+    position: 'relative',
+    marginBottom: 16,
   },
   avatarPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    borderWidth: 4,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  avatarImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 4,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   avatarText: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 38,
+    fontWeight: '900',
     color: '#059669',
   },
-  userName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
+  verifiedBadge: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    backgroundColor: '#3b82f6',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#ffffff',
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     marginBottom: 4,
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#ffffff',
+    letterSpacing: -0.3,
   },
   userEmail: {
     fontSize: 14,
-    color: '#d1fae5',
+    color: '#e6fffa',
+    fontWeight: '500',
+    opacity: 0.9,
+    marginBottom: 12,
+  },
+  roleBadge: {
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+    // default background (will be overridden)
+    backgroundColor: '#64748b',
+  },
+  roleBadgeAdmin: {
+    backgroundColor: '#059669',
+  },
+  roleBadgeVolunteer: {
+    backgroundColor: '#64748b',
+  },
+  roleBadgeText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   sectionContainer: {
     paddingHorizontal: 24,
