@@ -105,8 +105,18 @@ export default function HomeScreen({ navigation }: any) {
             <Text style={styles.greeting}>{user?.name?.split(' ')[0]} <Ionicons name="hand-left" size={24} color="#fcd34d" /></Text>
             <Text style={styles.subtitle}>Mari buat perubahan untuk hari ini !</Text>
           </View>
-          <View style={styles.avatarMini}>
-            <Text style={styles.avatarMiniText}>{user?.name?.charAt(0).toUpperCase()}</Text>
+          <View style={styles.headerRight}>
+            <TouchableOpacity 
+              style={styles.notificationBtn} 
+              activeOpacity={0.7}
+              onPress={() => alert('Belum ada notifikasi baru untuk saat ini.')}
+            >
+              <Ionicons name="notifications-outline" size={26} color="#ffffff" />
+              <View style={styles.notificationBadge} />
+            </TouchableOpacity>
+            <View style={styles.avatarMini}>
+              <Text style={styles.avatarMiniText}>{user?.name?.charAt(0).toUpperCase()}</Text>
+            </View>
           </View>
         </View>
 
@@ -240,6 +250,27 @@ const styles = StyleSheet.create({
     color: '#a7f3d0',
     marginTop: 4,
     fontWeight: '500',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  notificationBtn: {
+    padding: 6,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#ef4444',
   },
   avatarMini: {
     width: 48,

@@ -16,7 +16,7 @@ async function bootstrap() {
 
   // CORS untuk frontend dan mobile
   app.enableCors({
-    origin: ['http://localhost:3001', 'http://localhost:19006'],
+    origin: true,
     credentials: true,
   });
 
