@@ -25,7 +25,7 @@ export default function ProfileScreen({ navigation }: any) {
       await api.put('/api/users/me/profile', { name: newName.trim() });
       await updateUser({ name: newName.trim() });
       setEditNameModalVisible(false);
-      Alert.alert('Berhasil.', 'Nama Anda telah diperbarui.');
+      Alert.alert('Berhasil', 'Nama Anda telah diperbarui.');
     } catch (error) {
       console.error(error);
       Alert.alert('Error!', 'Gagal memperbarui nama');
