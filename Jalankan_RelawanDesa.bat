@@ -12,7 +12,7 @@ pause
 
 echo.
 echo [1/3] Menyiapkan Backend (NestJS)...
-start cmd /k "title Backend API && cd api && if not exist .env copy .env.example .env && npm install && npx prisma generate && npx prisma db push && npm run start:dev"
+start cmd /k "title Backend API && cd api && if not exist .env copy .env.example .env && npm install && npx prisma generate && npx prisma db push && npx ts-node seed-admin.ts && npm run start:dev"
 
 echo [2/3] Menyiapkan Frontend Admin (Next.js)...
 start cmd /k "title Frontend Admin && cd cms && npm install && npm run dev"
