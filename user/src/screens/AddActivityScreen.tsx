@@ -219,15 +219,29 @@ export default function AddActivityScreen({ navigation }: any) {
               <Ionicons name="calendar" size={18} color="#0f172a" />
               <Text style={styles.label}>Tanggal Kegiatan</Text>
             </View>
-            <TouchableOpacity 
-              style={[styles.inputContainer, { padding: 16, justifyContent: 'center' }]} 
-              onPress={() => setShowDatePicker(true)}
-              activeOpacity={0.7}
-            >
-              <Text style={{ fontSize: 16, color: date ? '#0f172a' : '#94a3b8' }}>
-                {date ? date : 'Pilih Tanggal'}
-              </Text>
-            </TouchableOpacity>
+            <View style={[styles.inputContainer, { flexDirection: 'row', alignItems: 'center' }]}>
+              <TouchableOpacity 
+                style={{ flex: 1, padding: 16, justifyContent: 'center' }} 
+                onPress={() => setShowDatePicker(true)}
+                activeOpacity={0.7}
+              >
+                <Text style={{ fontSize: 16, color: date ? '#0f172a' : '#94a3b8' }}>
+                  {date ? date : 'Tekan untuk memilih tanggal'}
+                </Text>
+              </TouchableOpacity>
+              {date ? (
+                <TouchableOpacity 
+                  style={{ padding: 16 }} 
+                  onPress={() => setDate('')}
+                >
+                  <Ionicons name="close-circle" size={20} color="#ef4444" />
+                </TouchableOpacity>
+              ) : (
+                <View style={{ padding: 16 }}>
+                  <Ionicons name="calendar-outline" size={20} color="#94a3b8" />
+                </View>
+              )}
+            </View>
           </View>
 
           {showDatePicker && (
