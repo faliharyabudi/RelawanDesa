@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
   ActivityIndicator, RefreshControl, Animated, Image, TextInput
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import api, { API_URL } from '../lib/api';
 import { Activity } from '../types';
@@ -41,9 +42,11 @@ export default function HomeScreen({ navigation }: any) {
     }
   };
 
-  useEffect(() => {
-    fetchActivities();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchActivities();
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
