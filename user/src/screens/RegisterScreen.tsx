@@ -43,7 +43,8 @@ export default function RegisterScreen({ navigation }: any) {
       if (error.message === 'Network Error' || !error.response) {
         Alert.alert('Koneksi Gagal', 'Tidak dapat terhubung ke server. Pastikan Backend NestJS sedang berjalan.');
       } else {
-        const message = error.response?.data?.message || 'Registrasi gagal, pastikan email belum terpakai';
+        const rawMessage = error.response?.data?.message;
+        const message = Array.isArray(rawMessage) ? rawMessage.join('\n') : (rawMessage || 'Registrasi gagal, pastikan email belum terpakai');
         Alert.alert('Error', message);
       }
     } finally {

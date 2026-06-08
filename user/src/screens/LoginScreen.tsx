@@ -43,7 +43,8 @@ export default function LoginScreen({ navigation }: any) {
       if (error.message === 'Network Error' || !error.response) {
         Alert.alert('Koneksi Gagal', 'Tidak dapat terhubung ke server. Pastikan Backend NestJS sedang berjalan.');
       } else {
-        const message = error.response?.data?.message || 'Email atau password salah';
+        const rawMessage = error.response?.data?.message;
+        const message = Array.isArray(rawMessage) ? rawMessage.join('\n') : (rawMessage || 'Email atau password salah');
         Alert.alert('Login Gagal', message);
       }
     } finally {
