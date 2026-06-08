@@ -21,27 +21,31 @@ function MainTabNavigator() {
   const insets = useSafeAreaInsets();
 
   return (
-    <Tab.Navigator
+      <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#059669',
         tabBarInactiveTintColor: '#94a3b8',
         tabBarStyle: {
+          position: 'absolute',
+          bottom: 16,
+          left: 16,
+          right: 16,
           backgroundColor: '#ffffff',
-          borderTopColor: '#d1fae5',
-          borderTopWidth: 1.5,
-          height: 68 + insets.bottom,
-          paddingBottom: 10 + insets.bottom,
+          borderRadius: 24,
+          height: 68,
+          paddingBottom: 8,
           paddingTop: 8,
-          elevation: 16,
+          borderTopWidth: 0,
+          elevation: 10,
           shadowColor: '#059669',
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.1,
-          shadowRadius: 12,
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.15,
+          shadowRadius: 16,
         },
         tabBarLabelStyle: {
+          fontFamily: 'PlusJakartaSans_700Bold',
           fontSize: 11,
-          fontWeight: '700',
           letterSpacing: 0.2,
         }
       }}
@@ -93,7 +97,7 @@ export default function AppNavigator() {
                 title: 'Detail Kegiatan',
                 headerStyle: { backgroundColor: '#059669' },
                 headerTintColor: '#ffffff',
-                headerTitleStyle: { fontWeight: '800', fontSize: 18 },
+                headerTitleStyle: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 18 },
                 headerShadowVisible: false,
               }}
             />
@@ -105,7 +109,7 @@ export default function AppNavigator() {
                 title: 'Tambah Kegiatan',
                 headerStyle: { backgroundColor: '#059669' },
                 headerTintColor: '#ffffff',
-                headerTitleStyle: { fontWeight: '800', fontSize: 18 },
+                headerTitleStyle: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 18 },
                 headerShadowVisible: false,
               }}
             />
