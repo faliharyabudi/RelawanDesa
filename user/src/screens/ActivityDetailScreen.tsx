@@ -360,10 +360,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 16,
   },
-  heroBadgeText: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  heroBadgeText: { fontFamily: 'PlusJakartaSans_700Bold', color: '#fff', fontSize: 13 },
   heroTitle: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 28,
-    fontWeight: '800',
     color: '#ffffff',
     lineHeight: 36,
     letterSpacing: -0.5,
@@ -375,9 +375,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   heroVolunteerText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     color: '#d1fae5',
     fontSize: 14,
-    fontWeight: '500',
   },
   joinedBadge: {
     flexDirection: 'row',
@@ -390,8 +390,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   joinedBadgeText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     color: '#059669',
-    fontWeight: '700',
     fontSize: 14,
   },
   infoSection: {
@@ -421,14 +421,14 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   infoContent: { flex: 1 },
-  infoLabel: { fontSize: 13, color: '#64748b', fontWeight: '500', marginBottom: 4 },
-  infoValue: { fontSize: 16, fontWeight: '700', color: '#0f172a' },
+  infoLabel: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 13, color: '#64748b', marginBottom: 4 },
+  infoValue: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 16, color: '#0f172a' },
   descSection: {
     padding: 24,
   },
   descTitle: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 20,
-    fontWeight: '800',
     color: '#0f172a',
     marginBottom: 16,
   },
@@ -443,6 +443,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   descText: {
+    fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 15,
     color: '#475569',
     lineHeight: 26,
@@ -472,14 +473,14 @@ const styles = StyleSheet.create({
     borderColor: '#d1fae5',
   },
   volunteerAvatarText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     color: '#059669',
-    fontWeight: '700',
     fontSize: 16,
   },
   volunteerName: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 15,
     color: '#334155',
-    fontWeight: '500',
   },
   footerOverlay: {
     position: 'absolute',
@@ -505,9 +506,9 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   joinButtonText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     color: '#ffffff',
     fontSize: 16,
-    fontWeight: 'bold',
   },
   unjoinButton: {
     flexDirection: 'row',
@@ -520,9 +521,9 @@ const styles = StyleSheet.create({
     borderColor: '#fca5a5',
   },
   unjoinButtonText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     color: '#ef4444',
     fontSize: 16,
-    fontWeight: 'bold',
   },
   loadingBtn: {
     flexDirection: 'row',
@@ -532,8 +533,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   loadingBtnText: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     color: '#64748b',
-    fontWeight: '600',
   },
   deleteButton: {
     flexDirection: 'row',
@@ -546,8 +547,8 @@ const styles = StyleSheet.create({
     borderColor: '#fca5a5',
   },
   deleteButtonText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     color: '#ef4444',
     fontSize: 15,
-    fontWeight: '700',
   },
 });
