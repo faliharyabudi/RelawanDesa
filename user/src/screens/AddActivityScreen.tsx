@@ -9,6 +9,7 @@ import api, { API_URL } from '../lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function AddActivityScreen({ navigation }: any) {
   const [title, setTitle] = useState('');
@@ -16,6 +17,8 @@ export default function AddActivityScreen({ navigation }: any) {
   const [location, setLocation] = useState('');
   const [locationCoords, setLocationCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [date, setDate] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [tempDate, setTempDate] = useState(new Date());
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingGps, setLoadingGps] = useState(false);
@@ -152,15 +155,6 @@ export default function AddActivityScreen({ navigation }: any) {
       onChangeText: setDescription,
       multiline: true,
     },
-    {
-      icon: <Ionicons name="calendar" size={18} color="#0f172a" />,
-      label: 'Tanggal (Format: YYYY-MM-DD)',
-      placeholder: 'Contoh: 2026-06-15',
-      value: date,
-      onChangeText: setDate,
-      multiline: false,
-      keyboardType: 'default' as const,
-    },
   ];
 
   return (
@@ -219,6 +213,41 @@ export default function AddActivityScreen({ navigation }: any) {
             </View>
           ))}
 
+          {/* Date Picker Field */}
+          <View style={styles.inputGroup}>
+            <View style={styles.labelRow}>
+              <Ionicons name="calendar" size={18} color="#0f172a" />
+              <Text style={styles.label}>Tanggal Kegiatan</Text>
+            </View>
+            <TouchableOpacity 
+              style={[styles.inputContainer, { padding: 16, justifyContent: 'center' }]} 
+              onPress={() => setShowDatePicker(true)}
+              activeOpacity={0.7}
+            >
+              <Text style={{ fontSize: 16, color: date ? '#0f172a' : '#94a3b8' }}>
+                {date ? date : 'Pilih Tanggal'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={tempDate}
+              mode="date"
+              display="default"
+              onChange={(event: any, selectedDate?: Date) => {
+                setShowDatePicker(false);
+                if (event.type === 'set' && selectedDate) {
+                  setTempDate(selectedDate);
+                  const year = selectedDate.getFullYear();
+                  const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                  const day = String(selectedDate.getDate()).padStart(2, '0');
+                  setDate(`${year}-${month}-${day}`);
+                }
+              }}
+            />
+          )}
+
           {/* Location Picker */}
           <View style={styles.inputGroup}>
             <View style={styles.labelRow}>
@@ -250,14 +279,7 @@ export default function AddActivityScreen({ navigation }: any) {
             )}
           </View>
 
-          {/* Tip Box */}
-          <View style={styles.tipBox}>
-            <Ionicons name="bulb" size={24} color="#d97706" />
-            <Text style={styles.tipText}>
-              Pastikan tanggal sudah benar. Format harus: <Text style={styles.tipBold}>YYYY-MM-DD</Text>{'\n'}
-              Contoh: <Text style={styles.tipBold}>2026-06-15</Text>
-            </Text>
-          </View>
+
 
           {/* Submit Button */}
           <TouchableOpacity onPress={handleSubmit} disabled={loading} activeOpacity={0.85}>
