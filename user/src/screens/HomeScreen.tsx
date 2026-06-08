@@ -238,21 +238,21 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   greetingSmall: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
     color: '#d1fae5',
-    fontWeight: '500',
   },
   greeting: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 28,
-    fontWeight: '800',
     color: '#ffffff',
     letterSpacing: -0.5,
   },
   subtitle: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
     color: '#a7f3d0',
     marginTop: 4,
-    fontWeight: '500',
   },
   headerRight: {
     flexDirection: 'row',
@@ -289,8 +289,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   avatarMiniText: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 20,
-    fontWeight: '800',
     color: '#059669',
   },
   statRow: {
@@ -306,14 +306,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statNum: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 20,
-    fontWeight: '800',
     color: '#ffffff',
   },
   statLabel: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 11,
     color: '#d1fae5',
-    fontWeight: '600',
     marginTop: 4,
     textTransform: 'uppercase',
   },
@@ -344,6 +344,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   searchInput: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     flex: 1,
     fontSize: 15,
     color: '#0f172a',
@@ -357,12 +358,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionTitle: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 22,
-    fontWeight: '800',
     color: '#0f172a',
     letterSpacing: -0.3,
   },
   sectionSubtitle: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
     color: '#64748b',
     marginTop: 2,
@@ -380,8 +382,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   addBtnText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     color: '#ffffff',
-    fontWeight: 'bold',
     fontSize: 14,
   },
   adminBanner: {
@@ -399,6 +401,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   adminBannerText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     flex: 1,
     fontSize: 13,
     color: '#92400e',
@@ -443,9 +446,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   badgeText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     color: '#ffffff',
     fontSize: 11,
-    fontWeight: '700',
   },
   volunteerBadge: {
     flexDirection: 'row',
@@ -457,18 +460,19 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   volunteerText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
     color: '#059669',
     fontSize: 12,
-    fontWeight: '700',
   },
   cardTitle: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 18,
-    fontWeight: '800',
     color: '#0f172a',
     marginBottom: 8,
     lineHeight: 24,
   },
   cardDesc: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
     color: '#475569',
     lineHeight: 22,
@@ -488,9 +492,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   footerText: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 12,
     color: '#64748b',
-    fontWeight: '600',
   },
   center: {
     flex: 1,
@@ -499,6 +503,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   loadingText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     color: '#64748b',
     fontSize: 14,
   },
@@ -508,12 +513,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   emptyTitle: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 18,
-    fontWeight: '800',
     color: '#0f172a',
     marginBottom: 8,
   },
   emptyText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
     color: '#94a3b8',
     fontSize: 14,
     textAlign: 'center',
