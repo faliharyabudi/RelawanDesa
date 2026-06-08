@@ -90,40 +90,40 @@ export default function ActivitiesPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-50 text-slate-500 text-sm border-b border-slate-100">
-              <th className="px-6 py-4 font-medium">Judul</th>
-              <th className="px-6 py-4 font-medium">Lokasi</th>
-              <th className="px-6 py-4 font-medium">Tanggal</th>
-              <th className="px-6 py-4 font-medium">Relawan</th>
-              <th className="px-6 py-4 font-medium text-right">Aksi</th>
+            <tr className="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100/80">
+              <th className="px-8 py-5 font-semibold tracking-wide">Judul Kegiatan</th>
+              <th className="px-8 py-5 font-semibold tracking-wide">Lokasi</th>
+              <th className="px-8 py-5 font-semibold tracking-wide">Tanggal</th>
+              <th className="px-8 py-5 font-semibold tracking-wide">Relawan</th>
+              <th className="px-8 py-5 font-semibold tracking-wide text-right">Aksi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 text-slate-700">
+          <tbody className="divide-y divide-slate-100/80 text-slate-700">
             {loading ? (
               <tr>
-                <td colSpan={5} className="text-center py-8 text-slate-400">Memuat data...</td>
+                <td colSpan={5} className="text-center py-12 text-slate-400 font-medium">Memuat data kegiatan...</td>
               </tr>
             ) : activities.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-8 text-slate-400">Belum ada kegiatan.</td>
+                <td colSpan={5} className="text-center py-12 text-slate-400 font-medium">Belum ada kegiatan yang terdaftar.</td>
               </tr>
             ) : (
               activities.map((act) => (
-                <tr key={act.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-medium">{act.title}</td>
-                  <td className="px-6 py-4">{act.location}</td>
-                  <td className="px-6 py-4">{new Date(act.date).toLocaleDateString('id-ID')}</td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                <tr key={act.id} className="hover:bg-emerald-50/30 transition-all duration-300 group">
+                  <td className="px-8 py-5 font-bold text-slate-800">{act.title}</td>
+                  <td className="px-8 py-5 font-medium text-slate-600">{act.location}</td>
+                  <td className="px-8 py-5 font-medium text-slate-600">{new Date(act.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</td>
+                  <td className="px-8 py-5">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100/80 text-emerald-700 ring-1 ring-emerald-600/10">
                       {act._count?.volunteers || 0} orang
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right space-x-3">
-                    <button onClick={() => openEdit(act)} className="text-blue-500 hover:text-blue-700 font-medium text-sm">Edit</button>
-                    <button onClick={() => handleDelete(act.id)} className="text-red-500 hover:text-red-700 font-medium text-sm">Hapus</button>
+                  <td className="px-8 py-5 text-right space-x-4 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => openEdit(act)} className="text-indigo-500 hover:text-indigo-700 font-bold text-sm bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">Edit</button>
+                    <button onClick={() => handleDelete(act.id)} className="text-rose-500 hover:text-rose-700 font-bold text-sm bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-colors">Hapus</button>
                   </td>
                 </tr>
               ))
