@@ -13,3 +13,4 @@ Batch 3: style: update terms button border radius
 Batch 3: chore: revise modal overlay background tint
 Batch 3: refactor: extract terms body into isolated view
 Batch 3: style: enhance modal entering animation
+Batch 3: chore: fix typo in terms section 1
