@@ -15,3 +15,4 @@ Batch 3: refactor: extract terms body into isolated view
 Batch 3: style: enhance modal entering animation
 Batch 3: chore: fix typo in terms section 1
 Batch 3: fix: handle scroll overflow in terms content
+Batch 3: style: add bold weight to terms subheadings
