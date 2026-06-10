@@ -42,3 +42,4 @@ Batch 3: fix: correct elevation for android
 Batch 3: style: refine modal border radius
 Batch 3: chore: adjust terms text line height
 Batch 3: refactor: simplify terms scrollview structure
+Batch 3: style: update terms title font size
