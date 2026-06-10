@@ -1,2 +1,3 @@
 Batch 3: chore: minor ui adjustments to terms layout
 Batch 3: fix: adjust padding on terms scrollview
+Batch 3: style: improve terms modal close button alignment
