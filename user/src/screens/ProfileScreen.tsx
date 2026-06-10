@@ -12,6 +12,8 @@ export default function ProfileScreen({ navigation }: any) {
 
   const [isEditNameModalVisible, setEditNameModalVisible] = useState(false);
   const [isAboutModalVisible, setAboutModalVisible] = useState(false);
+  const [isTermsModalVisible, setTermsModalVisible] = useState(false);
+  const [isTermsModalVisible, setTermsModalVisible] = useState(false);
   const [newName, setNewName] = useState(user?.name || '');
   const [isUpdatingName, setIsUpdatingName] = useState(false);
 
@@ -191,7 +193,7 @@ export default function ProfileScreen({ navigation }: any) {
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.cardRowAction} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.cardRowAction} activeOpacity={0.7} onPress={() => setTermsModalVisible(true)}>
               <View style={styles.iconBoxGray}>
                 <Ionicons name="document-text" size={20} color="#64748b" />
               </View>
@@ -286,6 +288,49 @@ export default function ProfileScreen({ navigation }: any) {
               activeOpacity={0.8}
             >
               <Text style={styles.aboutBtnCloseText}>Tutup</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Terms & Conditions Modal */}
+      <Modal
+        visible={isTermsModalVisible}
+        transparent={true}
+        animationType="slide"
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.termsModalContent}>
+            <View style={styles.aboutHeader}>
+              <View style={styles.termsIconContainer}>
+                <Ionicons name="document-text" size={40} color="#0284c7" />
+              </View>
+              <Text style={styles.aboutTitle}>Syarat & Ketentuan</Text>
+            </View>
+            <ScrollView style={styles.termsBody} showsVerticalScrollIndicator={false}>
+              <Text style={styles.termsText}>
+                <Text style={styles.termsTextBold}>1. Pendaftaran Relawan</Text>
+                {'\n'}Setiap pengguna wajib memberikan data asli yang valid dan dapat dipertanggungjawabkan saat mendaftar.
+                {'\n\n'}
+                <Text style={styles.termsTextBold}>2. Partisipasi Kegiatan</Text>
+                {'\n'}Relawan yang telah menyetujui untuk ikut serta diharapkan hadir dan berkontribusi secara penuh. Ketidakhadiran tanpa keterangan dapat mempengaruhi status relawan.
+                {'\n\n'}
+                <Text style={styles.termsTextBold}>3. Privasi & Keamanan Data</Text>
+                {'\n'}Data pribadi Anda dilindungi dengan enkripsi dan hanya digunakan untuk keperluan koordinasi RelawanDesa. Kami tidak akan menjual atau membagikannya kepada pihak ketiga.
+                {'\n\n'}
+                <Text style={styles.termsTextBold}>4. Etika Berinteraksi</Text>
+                {'\n'}Selama mengikuti kegiatan, relawan wajib menjaga kesopanan, menghormati nilai dan budaya lokal, serta bersikap suportif terhadap rekan relawan lainnya.
+                {'\n\n'}
+                <Text style={styles.termsTextBold}>5. Pembaruan Aturan</Text>
+                {'\n'}Pihak RelawanDesa berhak untuk memperbarui syarat dan ketentuan ini sewaktu-waktu.
+              </Text>
+            </ScrollView>
+            <TouchableOpacity
+              style={styles.termsBtnClose}
+              onPress={() => setTermsModalVisible(false)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.termsBtnCloseText}>Saya Mengerti</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -620,6 +665,63 @@ const styles = StyleSheet.create({
   },
   aboutBtnCloseText: {
     color: '#0f172a',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  termsModalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 32,
+    padding: 32,
+    width: '100%',
+    maxHeight: '85%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.25,
+    shadowRadius: 30,
+    elevation: 20,
+    alignItems: 'center',
+  },
+  termsIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#f0f9ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#e0f2fe',
+  },
+  termsBody: {
+    marginBottom: 24,
+    width: '100%',
+  },
+  termsText: {
+    fontSize: 14,
+    color: '#475569',
+    textAlign: 'left',
+    lineHeight: 24,
+  },
+  termsTextBold: {
+    fontWeight: '800',
+    color: '#0f172a',
+    fontSize: 15,
+  },
+  termsBtnClose: {
+    backgroundColor: '#0284c7',
+    paddingVertical: 16,
+    paddingHorizontal: 30,
+    borderRadius: 20,
+    width: '100%',
+    alignItems: 'center',
+    shadowColor: '#0284c7',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  termsBtnCloseText: {
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '800',
   }
