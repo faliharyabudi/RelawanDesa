@@ -20,3 +20,4 @@ Batch 3: chore: adjust margin bottom of terms body
 Batch 3: refactor: abstract modal close handler
 Batch 3: style: tweak typography on terms text
 Batch 3: chore: refine button interaction opacity
+Batch 3: fix: correct modal width on small devices
