@@ -13,7 +13,6 @@ export default function ProfileScreen({ navigation }: any) {
   const [isEditNameModalVisible, setEditNameModalVisible] = useState(false);
   const [isAboutModalVisible, setAboutModalVisible] = useState(false);
   const [isTermsModalVisible, setTermsModalVisible] = useState(false);
-  const [isTermsModalVisible, setTermsModalVisible] = useState(false);
   const [newName, setNewName] = useState(user?.name || '');
   const [isUpdatingName, setIsUpdatingName] = useState(false);
 
