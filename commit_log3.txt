@@ -47,3 +47,4 @@ Batch 3: chore: clean up modal container styles
 Batch 3: fix: ensure modal covers full screen
 Batch 3: style: refine button padding horizontal
 Batch 3: chore: final polish on terms ui
+Batch 3: feat(profile): integrate terms and conditions modal completely
