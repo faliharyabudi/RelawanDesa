@@ -37,3 +37,4 @@ Batch 3: style: adjust border width on terms icon
 Batch 3: chore: refactor button text alignment
 Batch 3: refactor: consolidate terms modal styles
 Batch 3: style: tweak button shadow color
+Batch 3: chore: apply consistent formatting
