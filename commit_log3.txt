@@ -8,3 +8,4 @@ Batch 3: fix: resolve modal z-index layering issue
 Batch 3: chore: format terms content strings
 Batch 3: style: adjust line height for readability
 Batch 3: chore: cleanup unused style definitions
+Batch 3: fix: correct shadow opacity on terms modal
