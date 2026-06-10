@@ -21,3 +21,4 @@ Batch 3: refactor: abstract modal close handler
 Batch 3: style: tweak typography on terms text
 Batch 3: chore: refine button interaction opacity
 Batch 3: fix: correct modal width on small devices
+Batch 3: style: adjust terms icon container dimensions
