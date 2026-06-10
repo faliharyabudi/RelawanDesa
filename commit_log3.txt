@@ -33,3 +33,4 @@ Batch 3: refactor: move terms strings to constants
 Batch 3: style: improve contrast of terms text
 Batch 3: chore: optimize render cycle for terms modal
 Batch 3: fix: correct max-height property value
+Batch 3: style: adjust border width on terms icon
