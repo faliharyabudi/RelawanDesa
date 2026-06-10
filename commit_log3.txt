@@ -29,3 +29,4 @@ Batch 3: chore: add padding to terms content box
 Batch 3: fix: resolve text wrapping behavior in terms
 Batch 3: style: refine shadow offset on terms modal
 Batch 3: chore: adjust letter spacing on terms title
+Batch 3: refactor: move terms strings to constants
