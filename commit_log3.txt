@@ -4,3 +4,4 @@ Batch 3: style: improve terms modal close button alignment
 Batch 3: chore: restructure terms paragraph elements
 Batch 3: refactor: optimize terms state handling
 Batch 3: style: tweak terms icon background color
+Batch 3: fix: resolve modal z-index layering issue
