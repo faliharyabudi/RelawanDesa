@@ -25,3 +25,4 @@ Batch 3: style: adjust terms icon container dimensions
 Batch 3: chore: reformat modal layout hierarchy
 Batch 3: refactor: streamline stylesheet properties
 Batch 3: style: update primary color of terms icon
+Batch 3: chore: add padding to terms content box
