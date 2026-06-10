@@ -44,3 +44,4 @@ Batch 3: chore: adjust terms text line height
 Batch 3: refactor: simplify terms scrollview structure
 Batch 3: style: update terms title font size
 Batch 3: chore: clean up modal container styles
+Batch 3: fix: ensure modal covers full screen
