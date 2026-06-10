@@ -11,6 +11,7 @@ export default function ProfileScreen({ navigation }: any) {
   const [loading, setLoading] = useState(false);
 
   const [isEditNameModalVisible, setEditNameModalVisible] = useState(false);
+  const [isAboutModalVisible, setAboutModalVisible] = useState(false);
   const [newName, setNewName] = useState(user?.name || '');
   const [isUpdatingName, setIsUpdatingName] = useState(false);
 
@@ -180,7 +181,7 @@ export default function ProfileScreen({ navigation }: any) {
 
           <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Tentang Aplikasi</Text>
           <View style={styles.cardGroup}>
-            <TouchableOpacity style={styles.cardRowAction} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.cardRowAction} activeOpacity={0.7} onPress={() => setAboutModalVisible(true)}>
               <View style={styles.iconBoxGray}>
                 <Ionicons name="information-circle" size={20} color="#64748b" />
               </View>
@@ -252,6 +253,40 @@ export default function ProfileScreen({ navigation }: any) {
                 )}
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* About App Modal */}
+      <Modal
+        visible={isAboutModalVisible}
+        transparent={true}
+        animationType="slide"
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.aboutModalContent}>
+            <View style={styles.aboutHeader}>
+              <View style={styles.aboutIconContainer}>
+                <Ionicons name="leaf" size={40} color="#059669" />
+              </View>
+              <Text style={styles.aboutTitle}>RelawanDesa</Text>
+              <Text style={styles.aboutVersion}>Versi 1.0.0</Text>
+            </View>
+            <View style={styles.aboutBody}>
+              <Text style={styles.aboutText}>
+                RelawanDesa adalah platform digital inovatif yang menghubungkan relawan dengan berbagai kegiatan sosial dan pembangunan nyata di desa-desa.
+              </Text>
+              <Text style={styles.aboutText}>
+                Misi utama kami adalah menciptakan dampak positif melalui kolaborasi nyata untuk kemajuan dan kesejahteraan masyarakat desa.
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.aboutBtnClose}
+              onPress={() => setAboutModalVisible(false)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.aboutBtnCloseText}>Tutup</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -526,5 +561,66 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '700',
     fontSize: 16,
+  },
+  aboutModalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 32,
+    padding: 32,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.25,
+    shadowRadius: 30,
+    elevation: 20,
+    alignItems: 'center',
+  },
+  aboutHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  aboutIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#ecfdf5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#d1fae5',
+  },
+  aboutTitle: {
+    fontSize: 26,
+    fontWeight: '900',
+    color: '#0f172a',
+    marginBottom: 4,
+  },
+  aboutVersion: {
+    fontSize: 14,
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  aboutBody: {
+    marginBottom: 32,
+  },
+  aboutText: {
+    fontSize: 15,
+    color: '#475569',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 12,
+  },
+  aboutBtnClose: {
+    backgroundColor: '#f1f5f9',
+    paddingVertical: 16,
+    paddingHorizontal: 40,
+    borderRadius: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  aboutBtnCloseText: {
+    color: '#0f172a',
+    fontSize: 16,
+    fontWeight: '800',
   }
 });
