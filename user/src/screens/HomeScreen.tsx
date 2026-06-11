@@ -117,9 +117,13 @@ export default function HomeScreen({ navigation }: any) {
               <Ionicons name="notifications-outline" size={26} color="#ffffff" />
               <View style={styles.notificationBadge} />
             </TouchableOpacity>
-            <View style={styles.avatarMini}>
+            <TouchableOpacity 
+              style={styles.avatarMini}
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('Profil')}
+            >
               <Text style={styles.avatarMiniText}>{user?.name?.charAt(0).toUpperCase()}</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
 
