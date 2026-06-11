@@ -26,12 +26,13 @@ function MainTabNavigator() {
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
-          tabBarShowLabel: false,
+          tabBarActiveTintColor: '#059669',
+          tabBarInactiveTintColor: '#94a3b8',
           tabBarStyle: {
             backgroundColor: '#ffffff',
-            height: 70 + (insets.bottom || 0),
-            paddingBottom: insets.bottom || 10,
-            paddingTop: 10,
+            height: 64 + (insets.bottom || 0),
+            paddingBottom: insets.bottom || 8,
+            paddingTop: 8,
             borderTopWidth: 1,
             borderTopColor: '#f1f5f9',
             elevation: 10,
@@ -40,66 +41,32 @@ function MainTabNavigator() {
             shadowOpacity: 0.05,
             shadowRadius: 10,
           },
+          tabBarLabelStyle: {
+            fontFamily: 'PlusJakartaSans_700Bold',
+            fontSize: 11,
+            marginTop: 4,
+          }
         }}
       >
       <Tab.Screen
         name="Beranda"
         component={HomeScreen}
         options={{
-          tabBarIcon: ({ focused }) => (
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: focused ? '#ecfdf5' : 'transparent',
-              paddingHorizontal: focused ? 16 : 0,
-              paddingVertical: 10,
-              borderRadius: 20,
-              gap: 6,
-            }}>
-              <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={focused ? '#059669' : '#94a3b8'} />
-              {focused && <Text style={{ color: '#059669', fontFamily: 'PlusJakartaSans_700Bold', fontSize: 13 }}>Beranda</Text>}
-            </View>
-          )
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={color} />
         }}
       />
       <Tab.Screen
         name="Riwayat"
         component={HistoryScreen}
         options={{
-          tabBarIcon: ({ focused }) => (
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: focused ? '#ecfdf5' : 'transparent',
-              paddingHorizontal: focused ? 16 : 0,
-              paddingVertical: 10,
-              borderRadius: 20,
-              gap: 6,
-            }}>
-              <Ionicons name={focused ? 'time' : 'time-outline'} size={24} color={focused ? '#059669' : '#94a3b8'} />
-              {focused && <Text style={{ color: '#059669', fontFamily: 'PlusJakartaSans_700Bold', fontSize: 13 }}>Riwayat</Text>}
-            </View>
-          )
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'time' : 'time-outline'} size={24} color={color} />
         }}
       />
       <Tab.Screen
         name="Profil"
         component={ProfileScreen}
         options={{
-          tabBarIcon: ({ focused }) => (
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: focused ? '#ecfdf5' : 'transparent',
-              paddingHorizontal: focused ? 16 : 0,
-              paddingVertical: 10,
-              borderRadius: 20,
-              gap: 6,
-            }}>
-              <Ionicons name={focused ? 'person' : 'person-outline'} size={24} color={focused ? '#059669' : '#94a3b8'} />
-              {focused && <Text style={{ color: '#059669', fontFamily: 'PlusJakartaSans_700Bold', fontSize: 13 }}>Profil</Text>}
-            </View>
-          )
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'person' : 'person-outline'} size={24} color={color} />
         }}
       />
     </Tab.Navigator>
