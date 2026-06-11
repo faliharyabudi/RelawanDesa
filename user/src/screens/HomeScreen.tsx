@@ -112,7 +112,7 @@ export default function HomeScreen({ navigation }: any) {
             <TouchableOpacity 
               style={styles.notificationBtn} 
               activeOpacity={0.7}
-              onPress={() => alert('Belum ada notifikasi baru untuk saat ini.')}
+              onPress={() => navigation.navigate('Notification')}
             >
               <Ionicons name="notifications-outline" size={26} color="#ffffff" />
               <View style={styles.notificationBadge} />

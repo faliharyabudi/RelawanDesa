@@ -13,6 +13,7 @@ import ActivityDetailScreen from '../screens/ActivityDetailScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AddActivityScreen from '../screens/AddActivityScreen';
+import NotificationScreen from '../screens/NotificationScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -107,6 +108,18 @@ export default function AppNavigator() {
               options={{
                 headerShown: true,
                 title: 'Tambah Kegiatan',
+                headerStyle: { backgroundColor: '#059669' },
+                headerTintColor: '#ffffff',
+                headerTitleStyle: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 18 },
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name="Notification"
+              component={NotificationScreen}
+              options={{
+                headerShown: true,
+                title: 'Notifikasi',
                 headerStyle: { backgroundColor: '#059669' },
                 headerTintColor: '#ffffff',
                 headerTitleStyle: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 18 },
