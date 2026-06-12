@@ -1,0 +1,1 @@
+// Placeholder for global state management (e.g. Zustand or Redux)
