@@ -136,29 +136,10 @@ export default function HomeScreen({ navigation }: any) {
           </View>
         </View>
 
-        {/* Stat Banner with Glassmorphism */}
-        <BlurView intensity={40} tint="light" style={styles.statRowWrapper}>
-          <View style={styles.statRow}>
-            <View style={styles.statBox}>
-              <Text style={styles.statNum}>{activities.length}</Text>
-              <Text style={styles.statLabel}>Kegiatan</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statBox}>
-              <Text style={styles.statNum}>
-                {activities.reduce((sum, a) => sum + (a._count?.volunteers || 0), 0)}
-              </Text>
-              <Text style={styles.statLabel}>Relawan</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statBox}>
-              <Text style={styles.statNum}>{user?.role === 'ADMIN' ? 'Admin' : 'User'}</Text>
-              <Text style={styles.statLabel}>Akses</Text>
-            </View>
-          </View>
-        </BlurView>
+        </View>
       </LinearGradient>
 
+      {/* Overlapping Search Bar */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#94a3b8" style={styles.searchIcon} />
         <TextInput
@@ -174,6 +155,33 @@ export default function HomeScreen({ navigation }: any) {
           </TouchableOpacity>
         )}
       </View>
+
+      {/* Aesthetic Grid Stats */}
+      <View style={styles.gridStatsContainer}>
+        <View style={styles.gridStatCard}>
+          <View style={[styles.gridIconBox, { backgroundColor: '#ecfdf5' }]}>
+            <Ionicons name="calendar" size={20} color="#059669" />
+          </View>
+          <View>
+            <Text style={styles.gridStatNum}>{activities.length}</Text>
+            <Text style={styles.gridStatLabel}>Kegiatan</Text>
+          </View>
+        </View>
+        
+        <View style={styles.gridStatCard}>
+          <View style={[styles.gridIconBox, { backgroundColor: '#fff7ed' }]}>
+            <Ionicons name="people" size={20} color="#ea580c" />
+          </View>
+          <View>
+            <Text style={styles.gridStatNum}>
+              {activities.reduce((sum, a) => sum + (a._count?.volunteers || 0), 0)}
+            </Text>
+            <Text style={styles.gridStatLabel}>Relawan</Text>
+          </View>
+        </View>
+      </View>
+
+
 
       <View style={styles.sectionHeader}>
         <View>
@@ -232,19 +240,14 @@ export default function HomeScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: '#f8fafc',
   },
   header: {
     paddingHorizontal: 24,
     paddingTop: 60,
-    paddingBottom: 32,
-    borderBottomLeftRadius: 36,
-    borderBottomRightRadius: 36,
-    shadowColor: '#064e3b',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.4,
-    shadowRadius: 15,
-    elevation: 10,
+    paddingBottom: 45, // Extra padding for overlapping search bar
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     overflow: 'hidden',
   },
   decorativeCircle: {
@@ -326,61 +329,63 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#78350f',
   },
-  statRowWrapper: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  statRow: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    paddingVertical: 18,
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-  },
-  statBox: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  statNum: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 22,
-    color: '#ffffff',
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  statLabel: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-    fontSize: 11,
-    color: '#a7f3d0',
-    marginTop: 6,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  statDivider: {
-    width: 1,
-    height: 36,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ffffff',
     marginHorizontal: 24,
-    marginTop: 24,
-    marginBottom: -4,
+    marginTop: -28, // Overlapping the header
+    marginBottom: 20,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 2,
+    paddingVertical: 14,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 15,
+    elevation: 8,
     borderWidth: 1,
     borderColor: '#f1f5f9',
+  },
+  gridStatsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 24,
+    gap: 16,
+    marginBottom: 8,
+  },
+  gridStatCard: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderRadius: 24,
+    shadowColor: '#64748b',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  gridIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  gridStatNum: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontSize: 20,
+    color: '#0f172a',
+  },
+  gridStatLabel: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 2,
   },
   searchIcon: {
     marginRight: 10,
