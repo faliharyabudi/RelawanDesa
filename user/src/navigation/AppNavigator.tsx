@@ -26,25 +26,24 @@ function MainTabNavigator() {
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: '#059669',
+          tabBarActiveTintColor: '#064e3b',
           tabBarInactiveTintColor: '#94a3b8',
           tabBarStyle: {
             backgroundColor: '#ffffff',
-            height: 64 + (insets.bottom || 0),
-            paddingBottom: insets.bottom || 8,
-            paddingTop: 8,
-            borderTopWidth: 1,
-            borderTopColor: '#f1f5f9',
-            elevation: 10,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: 0.05,
-            shadowRadius: 10,
+            height: 70 + (insets.bottom || 0),
+            paddingBottom: insets.bottom || 12,
+            paddingTop: 12,
+            borderTopWidth: 0,
+            elevation: 20,
+            shadowColor: '#064e3b',
+            shadowOffset: { width: 0, height: -6 },
+            shadowOpacity: 0.1,
+            shadowRadius: 15,
           },
           tabBarLabelStyle: {
-            fontFamily: 'PlusJakartaSans_700Bold',
+            fontFamily: 'PlusJakartaSans_800ExtraBold',
             fontSize: 11,
-            marginTop: 4,
+            marginTop: 6,
           }
         }}
       >
