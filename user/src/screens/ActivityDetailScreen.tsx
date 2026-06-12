@@ -8,6 +8,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 
+import { BlurView } from 'expo-blur';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 export default function ActivityDetailScreen({ route, navigation }: any) {
   const { activity } = route.params;
   const { user } = useAuth();
@@ -145,18 +148,64 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
   ];
 
   return (
+  const insets = useSafeAreaInsets();
+
+  return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         {/* Hero Section */}
         {activity.imageUrl ? (
           <ImageBackground 
             source={{ uri: `${API_URL}${activity.imageUrl}` }} 
             style={styles.heroImageBg}
-            imageStyle={{ opacity: 0.7 }}
           >
-            <LinearGradient colors={['rgba(5,150,105,0.4)', 'rgba(5,150,105,0.9)']} style={styles.heroGradientOverlay}>
+            <LinearGradient colors={['rgba(0,0,0,0.6)', 'transparent', 'rgba(4,120,87,0.9)']} style={styles.heroGradientOverlay}>
+              
+              {/* Custom Header with Glassmorphism */}
+              <View style={[styles.customHeader, { paddingTop: insets.top || 20 }]}>
+                <BlurView intensity={30} tint="light" style={styles.backBtnWrapper}>
+                  <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                    <Ionicons name="chevron-back" size={24} color="#ffffff" />
+                  </TouchableOpacity>
+                </BlurView>
+              </View>
+
+              <View style={styles.heroContentBottom}>
+                <View style={styles.heroBadge}>
+                  <Ionicons name="sparkles" size={14} color="#FBBF24" style={{marginRight: 6}} />
+                  <Text style={styles.heroBadgeText}>Aksi Sosial</Text>
+                </View>
+                <Text style={styles.heroTitle}>{activity.title}</Text>
+                <View style={styles.heroVolunteer}>
+                  <Ionicons name="people" size={16} color="#d1fae5" style={{marginRight: 6}} />
+                  <Text style={styles.heroVolunteerText}>
+                    {volunteerCount} relawan sudah bergabung
+                  </Text>
+                </View>
+
+                {/* Status Badge */}
+                {!checkingStatus && isJoined && (
+                  <View style={styles.joinedBadge}>
+                    <Ionicons name="checkmark-circle" size={16} color="#059669" style={{marginRight: 6}} />
+                    <Text style={styles.joinedBadgeText}>Anda sudah terdaftar</Text>
+                  </View>
+                )}
+              </View>
+            </LinearGradient>
+          </ImageBackground>
+        ) : (
+          <LinearGradient colors={['#064e3b', '#047857']} style={styles.heroFallback}>
+            <View style={[styles.customHeader, { paddingTop: insets.top || 20 }]}>
+              <BlurView intensity={30} tint="light" style={styles.backBtnWrapper}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                  <Ionicons name="chevron-back" size={24} color="#ffffff" />
+                </TouchableOpacity>
+              </BlurView>
+            </View>
+
+            <View style={styles.heroContentBottomFallback}>
               <View style={styles.heroBadge}>
-                <Ionicons name="leaf" size={16} color="#ffffff" style={{marginRight: 4}} />
+                <Ionicons name="sparkles" size={14} color="#FBBF24" style={{marginRight: 6}} />
                 <Text style={styles.heroBadgeText}>Aksi Sosial</Text>
               </View>
               <Text style={styles.heroTitle}>{activity.title}</Text>
@@ -167,38 +216,16 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
                 </Text>
               </View>
 
-              {/* Status Badge */}
               {!checkingStatus && isJoined && (
                 <View style={styles.joinedBadge}>
                   <Ionicons name="checkmark-circle" size={16} color="#059669" style={{marginRight: 6}} />
                   <Text style={styles.joinedBadgeText}>Anda sudah terdaftar</Text>
                 </View>
               )}
-            </LinearGradient>
-          </ImageBackground>
-        ) : (
-          <LinearGradient colors={['#059669', '#34d399']} style={styles.hero}>
-            <View style={styles.heroBadge}>
-              <Ionicons name="leaf" size={16} color="#ffffff" style={{marginRight: 4}} />
-              <Text style={styles.heroBadgeText}>Aksi Sosial</Text>
             </View>
-            <Text style={styles.heroTitle}>{activity.title}</Text>
-            <View style={styles.heroVolunteer}>
-              <Ionicons name="people" size={16} color="#d1fae5" style={{marginRight: 6}} />
-              <Text style={styles.heroVolunteerText}>
-                {volunteerCount} relawan sudah bergabung
-              </Text>
-            </View>
-
-            {/* Status Badge */}
-            {!checkingStatus && isJoined && (
-              <View style={styles.joinedBadge}>
-                <Ionicons name="checkmark-circle" size={16} color="#059669" style={{marginRight: 6}} />
-                <Text style={styles.joinedBadgeText}>Anda sudah terdaftar</Text>
-              </View>
-            )}
           </LinearGradient>
         )}
+
 
         {/* Info Cards */}
         <View style={styles.infoSection}>
@@ -336,38 +363,64 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0fdf4' },
-  hero: {
-    padding: 28,
-    paddingTop: 32,
-    paddingBottom: 48,
-  },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
   heroImageBg: {
-    backgroundColor: '#059669',
+    width: '100%',
+    height: 420,
+    backgroundColor: '#064e3b',
   },
   heroGradientOverlay: {
-    padding: 28,
-    paddingTop: 32,
-    paddingBottom: 48,
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingBottom: 40,
+  },
+  heroFallback: {
+    width: '100%',
+    paddingBottom: 40,
+  },
+  customHeader: {
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backBtnWrapper: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  backBtn: {
+    padding: 10,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
+  heroContentBottom: {
+    paddingHorizontal: 24,
+  },
+  heroContentBottomFallback: {
+    paddingHorizontal: 24,
+    marginTop: 40,
   },
   heroBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignSelf: 'flex-start',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 20,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  heroBadgeText: { fontFamily: 'PlusJakartaSans_700Bold', color: '#fff', fontSize: 13 },
+  heroBadgeText: { fontFamily: 'PlusJakartaSans_700Bold', color: '#fff', fontSize: 13, letterSpacing: 0.5 },
   heroTitle: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 28,
+    fontSize: 32,
     color: '#ffffff',
-    lineHeight: 36,
+    lineHeight: 40,
     letterSpacing: -0.5,
     marginBottom: 12,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   heroVolunteer: {
     flexDirection: 'row',
@@ -375,9 +428,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   heroVolunteerText: {
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     color: '#d1fae5',
-    fontSize: 14,
+    fontSize: 15,
   },
   joinedBadge: {
     flexDirection: 'row',
@@ -390,12 +443,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   joinedBadgeText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
-    color: '#059669',
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    color: '#064e3b',
     fontSize: 14,
   },
   infoSection: {
-    marginTop: -30,
+    marginTop: -24,
     paddingHorizontal: 20,
     gap: 12,
   },
@@ -404,31 +457,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ffffff',
     padding: 20,
-    borderRadius: 20,
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
+    borderRadius: 24,
+    shadowColor: '#64748b',
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowRadius: 16,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   infoIconBox: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: '#ecfdf5',
+    width: 54,
+    height: 54,
+    borderRadius: 18,
+    backgroundColor: '#f0fdf4',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
+    borderWidth: 1,
+    borderColor: '#d1fae5',
   },
   infoContent: { flex: 1 },
-  infoLabel: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 13, color: '#64748b', marginBottom: 4 },
-  infoValue: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 16, color: '#0f172a' },
+  infoLabel: { fontFamily: 'PlusJakartaSans_600SemiBold', fontSize: 12, color: '#94a3b8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
+  infoValue: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 16, color: '#0f172a' },
   descSection: {
     padding: 24,
   },
   descTitle: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 20,
+    fontSize: 22,
     color: '#0f172a',
     marginBottom: 16,
   },
@@ -436,14 +493,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     padding: 24,
     borderRadius: 24,
-    shadowColor: '#94a3b8',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 2,
+    shadowColor: '#64748b',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   descText: {
-    fontFamily: 'PlusJakartaSans_400Regular',
+    fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 15,
     color: '#475569',
     lineHeight: 26,
@@ -499,16 +558,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 18,
     borderRadius: 20,
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
+    shadowColor: '#064e3b',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
     elevation: 8,
   },
   joinButtonText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     color: '#ffffff',
     fontSize: 16,
+    letterSpacing: 0.5,
   },
   unjoinButton: {
     flexDirection: 'row',

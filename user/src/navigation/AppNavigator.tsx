@@ -91,12 +91,7 @@ export default function AppNavigator() {
               name="ActivityDetail"
               component={ActivityDetailScreen}
               options={{
-                headerShown: true,
-                title: 'Detail Kegiatan',
-                headerStyle: { backgroundColor: '#059669' },
-                headerTintColor: '#ffffff',
-                headerTitleStyle: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 18 },
-                headerShadowVisible: false,
+                headerShown: false,
               }}
             />
             <Stack.Screen
