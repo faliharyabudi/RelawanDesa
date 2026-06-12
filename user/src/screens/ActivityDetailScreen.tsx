@@ -147,7 +147,6 @@ export default function ActivityDetailScreen({ route, navigation }: any) {
     { icon: <Ionicons name="people" size={24} color="#059669" />, label: 'Total Relawan', value: `${volunteerCount} Orang Terdaftar` },
   ];
 
-  return (
   const insets = useSafeAreaInsets();
 
   return (
