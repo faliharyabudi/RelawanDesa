@@ -113,7 +113,7 @@ export default function ProfileScreen({ navigation }: any) {
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header Profile */}
-        <LinearGradient colors={['#059669', '#34d399']} style={styles.header}>
+        <LinearGradient colors={['#064e3b', '#047857']} style={styles.header}>
           <TouchableOpacity style={styles.avatarContainer} onPress={handlePickImage} disabled={loading}>
             {user?.avatarUrl ? (
               <Image source={{ uri: `${API_URL}${user.avatarUrl}` }} style={[styles.avatar, { padding: 0 }]} />
@@ -339,14 +339,14 @@ export default function ProfileScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0f4f8' },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
   header: {
-    paddingTop: 70,
-    paddingBottom: 45,
+    paddingTop: 80,
+    paddingBottom: 60,
     alignItems: 'center',
-    borderBottomLeftRadius: 45,
-    borderBottomRightRadius: 45,
-    shadowColor: '#047857',
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+    shadowColor: '#064e3b',
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.35,
     shadowRadius: 20,

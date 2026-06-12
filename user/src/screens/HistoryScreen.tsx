@@ -107,13 +107,18 @@ export default function HistoryScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#059669', '#10b981']} style={styles.header}>
+      <LinearGradient colors={['#064e3b', '#047857']} style={styles.header}>
+        {/* Decorative Circle */}
+        <View style={styles.decorativeCircle} />
+        
         <Text style={styles.headerTitle}>Riwayat Kegiatan</Text>
         <Text style={styles.headerSubtitle}>Jejak kebaikan yang telah Anda lakukan</Text>
         
-        <View style={styles.statChip}>
-          <Ionicons name="trophy" size={16} color="#d97706" style={{marginRight: 6}} />
-          <Text style={styles.statChipText}>{history.length} Kegiatan Diikuti</Text>
+        <View style={styles.statChipWrapper}>
+          <View style={styles.statChip}>
+            <Ionicons name="trophy" size={18} color="#FBBF24" style={{marginRight: 8}} />
+            <Text style={styles.statChipText}>{history.length} Kegiatan Diikuti</Text>
+          </View>
         </View>
       </LinearGradient>
 
@@ -151,39 +156,54 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8fafc' },
   header: {
     paddingTop: 60,
-    paddingBottom: 30,
+    paddingBottom: 40,
     paddingHorizontal: 24,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    shadowColor: '#059669',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
+    borderBottomLeftRadius: 36,
+    borderBottomRightRadius: 36,
+    shadowColor: '#064e3b',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 15,
+    elevation: 10,
     alignItems: 'center',
+    overflow: 'hidden',
   },
-  headerTitle: { fontSize: 24, fontWeight: '800', color: '#ffffff', marginBottom: 4 },
-  headerSubtitle: { fontSize: 14, color: '#d1fae5', marginBottom: 20 },
+  decorativeCircle: {
+    position: 'absolute',
+    top: -40,
+    right: -30,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  headerTitle: { fontSize: 26, fontFamily: 'PlusJakartaSans_800ExtraBold', color: '#ffffff', marginBottom: 6 },
+  headerSubtitle: { fontSize: 14, fontFamily: 'PlusJakartaSans_500Medium', color: '#a7f3d0', marginBottom: 24 },
+  statChipWrapper: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
   statChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fef3c7',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
-  statChipText: { color: '#92400e', fontWeight: 'bold', fontSize: 13 },
+  statChipText: { color: '#ffffff', fontFamily: 'PlusJakartaSans_700Bold', fontSize: 14 },
   list: { padding: 20, paddingTop: 24 },
   card: {
     backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 16,
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 20,
     shadowColor: '#64748b',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 2,
+    shadowRadius: 16,
+    elevation: 4,
     borderWidth: 1,
     borderColor: '#f1f5f9',
   },
@@ -191,7 +211,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   statusBadge: {
     flexDirection: 'row',
