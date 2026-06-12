@@ -430,6 +430,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 24,
     marginTop: -25,
+    paddingBottom: 100,
   },
   sectionTitle: {
     fontSize: 15,

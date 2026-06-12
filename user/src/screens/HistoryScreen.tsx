@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   statChipText: { color: '#ffffff', fontFamily: 'PlusJakartaSans_700Bold', fontSize: 14 },
-  list: { padding: 20, paddingTop: 24 },
+  list: { padding: 20, paddingTop: 24, paddingBottom: 100 },
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 24,
