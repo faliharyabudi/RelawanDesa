@@ -1,27 +1,4 @@
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'ADMIN' | 'USER';
-  avatarUrl?: string;
-  createdAt: string;
-}
-
-export interface Activity {
-  id: string;
-  title: string;
-  description: string;
-  location: string;
-  date: string;
-  createdAt: string;
-  updatedAt: string;
-  _count?: { volunteers: number };
-}
-
-export interface VolunteerActivity {
-  id: string;
-  userId: string;
-  activityId: string;
-  joinedAt: string;
-  activity: Activity;
-}
+export * from './user';
+export * from './activity';
+export * from './common';
+export * from './navigation';
