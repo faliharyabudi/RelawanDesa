@@ -17,13 +17,23 @@ export default function HomeScreen({ navigation }: any) {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('Semua');
   const isAdmin = user?.role === 'ADMIN';
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredActivities = activities.filter(activity =>
-    activity.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (activity.location && activity.location.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredActivities = activities.filter(activity => {
+    const matchesSearch = activity.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (activity.location && activity.location.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    // Simulating category filtering
+    if (activeCategory === 'Aksi Sosial') return matchesSearch && activity.title.includes('Sosial');
+    if (activeCategory === 'Lingkungan') return matchesSearch && activity.title.includes('Pohon');
+    if (activeCategory === 'Pendidikan') return matchesSearch && activity.title.includes('Belajar');
+    
+    return matchesSearch;
+  });
+
+  const categories = ['Semua', 'Aksi Sosial', 'Lingkungan', 'Pendidikan'];
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -58,44 +68,51 @@ export default function HomeScreen({ navigation }: any) {
   const renderItem = ({ item }: { item: Activity }) => (
     <Animated.View style={{ opacity: fadeAnim }}>
       <TouchableOpacity
-        style={styles.card}
+        style={styles.cardOverlay}
         activeOpacity={0.9}
         onPress={() => navigation.navigate('ActivityDetail', { activity: item })}
       >
-        <LinearGradient colors={['#ffffff', '#f8fafc']} style={styles.cardGradient}>
-          {item.imageUrl && (
-            <Image source={{ uri: `${API_URL}${item.imageUrl}` }} style={styles.cardImage} />
-          )}
-          <View style={[styles.cardHeader, item.imageUrl && { marginTop: 16 }]}>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>Aksi Sosial</Text>
+        <ImageBackground
+          source={item.imageUrl ? { uri: `${API_URL}${item.imageUrl}` } : require('../../assets/adaptive-icon.png')}
+          style={styles.cardImageBg}
+          imageStyle={{ borderRadius: 24 }}
+        >
+          <LinearGradient 
+            colors={['transparent', 'rgba(0,0,0,0.8)']} 
+            style={styles.cardGradientOverlay}
+          >
+            <View style={styles.cardHeaderOverlay}>
+              <View style={styles.badgeOverlay}>
+                <Text style={styles.badgeTextOverlay}>Aksi Sosial</Text>
+              </View>
+              <BlurView intensity={20} tint="dark" style={styles.volunteerBadgeOverlay}>
+                <Ionicons name="people" size={14} color="#FBBF24" />
+                <Text style={styles.volunteerTextOverlay}>
+                  {item._count?.volunteers || 0} Terdaftar
+                </Text>
+              </BlurView>
             </View>
-            <View style={styles.volunteerBadge}>
-              <Ionicons name="people" size={14} color="#059669" />
-              <Text style={styles.volunteerText}>
-                {item._count?.volunteers || 0} Terdaftar
-              </Text>
-            </View>
-          </View>
 
-          <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
-          <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
-
-          <View style={styles.cardFooter}>
-            <View style={styles.footerItem}>
-              <Ionicons name="calendar-outline" size={14} color="#64748b" />
-              <Text style={styles.footerText}>
-                {new Date(item.date).toLocaleDateString('id-ID', {
-                  day: 'numeric', month: 'short', year: 'numeric'
-                })}
-              </Text>
+            <View style={styles.cardContentOverlay}>
+              <Text style={styles.cardTitleOverlay} numberOfLines={2}>{item.title}</Text>
+              
+              <View style={styles.cardFooterOverlay}>
+                <View style={styles.footerItemOverlay}>
+                  <Ionicons name="calendar" size={14} color="#d1fae5" />
+                  <Text style={styles.footerTextOverlay}>
+                    {new Date(item.date).toLocaleDateString('id-ID', {
+                      day: 'numeric', month: 'short'
+                    })}
+                  </Text>
+                </View>
+                <View style={styles.footerItemOverlay}>
+                  <Ionicons name="location" size={14} color="#d1fae5" />
+                  <Text style={styles.footerTextOverlay} numberOfLines={1}>{item.location}</Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.footerItem}>
-              <Ionicons name="location-outline" size={14} color="#64748b" />
-              <Text style={styles.footerText} numberOfLines={1}>{item.location}</Text>
-            </View>
-          </View>
-        </LinearGradient>
+          </LinearGradient>
+        </ImageBackground>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -199,6 +216,28 @@ export default function HomeScreen({ navigation }: any) {
             </LinearGradient>
           </TouchableOpacity>
         )}
+      </View>
+
+      {/* Horizontal Category Filters */}
+      <View style={styles.categoriesWrapper}>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={categories}
+          keyExtractor={(item) => item}
+          contentContainerStyle={styles.categoriesContainer}
+          renderItem={({ item }) => (
+            <TouchableOpacity 
+              style={[styles.categoryPill, activeCategory === item && styles.categoryPillActive]}
+              onPress={() => setActiveCategory(item)}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.categoryText, activeCategory === item && styles.categoryTextActive]}>
+                {item}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
       </View>
 
       {/* Banner Admin */}
@@ -416,6 +455,38 @@ const styles = StyleSheet.create({
     color: '#64748b',
     marginTop: 2,
   },
+  categoriesWrapper: {
+    marginBottom: 20,
+  },
+  categoriesContainer: {
+    paddingHorizontal: 24,
+    gap: 12,
+  },
+  categoryPill: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    shadowColor: '#64748b',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  categoryPillActive: {
+    backgroundColor: '#064e3b',
+    borderColor: '#064e3b',
+  },
+  categoryText: {
+    fontFamily: 'PlusJakartaSans_700Bold',
+    fontSize: 14,
+    color: '#64748b',
+  },
+  categoryTextActive: {
+    color: '#ffffff',
+  },
   addBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -456,97 +527,92 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 20,
-    paddingBottom: 24,
+    paddingBottom: 100, // padding for floating navigation
   },
-  card: {
+  cardOverlay: {
     borderRadius: 24,
     marginBottom: 20,
-    backgroundColor: '#ffffff',
-    shadowColor: '#64748b',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
+    backgroundColor: '#064e3b',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    elevation: 8,
   },
-  cardGradient: {
-    borderRadius: 24,
-    padding: 20,
-    overflow: 'hidden',
-  },
-  cardImage: {
+  cardImageBg: {
     width: '100%',
-    height: 160,
-    borderRadius: 16,
-    marginBottom: 0,
-    backgroundColor: '#f1f5f9',
+    height: 280,
+    borderRadius: 24,
   },
-  cardHeader: {
+  cardGradientOverlay: {
+    flex: 1,
+    borderRadius: 24,
+    justifyContent: 'space-between',
+    padding: 20,
+  },
+  cardHeaderOverlay: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
   },
-  badge: {
-    backgroundColor: '#10b981',
+  badgeOverlay: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
-  badgeText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
+  badgeTextOverlay: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
     color: '#ffffff',
     fontSize: 11,
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
   },
-  volunteerBadge: {
+  volunteerBadgeOverlay: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0fdf4',
-    borderWidth: 1,
-    borderColor: '#d1fae5',
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 14,
+    overflow: 'hidden',
     gap: 6,
   },
-  volunteerText: {
-    fontFamily: 'PlusJakartaSans_700Bold',
-    color: '#059669',
+  volunteerTextOverlay: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    color: '#ffffff',
     fontSize: 11,
   },
-  cardTitle: {
+  cardContentOverlay: {
+    justifyContent: 'flex-end',
+  },
+  cardTitleOverlay: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 20,
-    color: '#0f172a',
-    marginBottom: 8,
-    lineHeight: 28,
+    fontSize: 24,
+    color: '#ffffff',
+    marginBottom: 12,
+    lineHeight: 32,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
-  cardDesc: {
-    fontFamily: 'PlusJakartaSans_500Medium',
-    fontSize: 14,
-    color: '#64748b',
-    lineHeight: 24,
-    marginBottom: 20,
-  },
-  cardFooter: {
+  cardFooterOverlay: {
     flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: '#f8fafc',
-    paddingTop: 16,
     gap: 16,
   },
-  footerItem: {
+  footerItemOverlay: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
     gap: 6,
   },
-  footerText: {
+  footerTextOverlay: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
-    fontSize: 12,
-    color: '#64748b',
+    fontSize: 13,
+    color: '#f8fafc',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   center: {
     flex: 1,
