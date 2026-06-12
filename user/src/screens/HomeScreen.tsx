@@ -10,6 +10,8 @@ import { Activity } from '../types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
+import { BlurView } from 'expo-blur';
+
 export default function HomeScreen({ navigation }: any) {
   const { user } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -101,51 +103,60 @@ export default function HomeScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <LinearGradient colors={['#059669', '#10b981']} style={styles.header}>
+      <LinearGradient colors={['#064e3b', '#047857']} style={styles.header}>
+        {/* Background Decorative Blur Element */}
+        <View style={styles.decorativeCircle} />
+        
         <View style={styles.headerContent}>
           <View>
-            <Text style={styles.greetingSmall}>Halo,</Text>
-            <Text style={styles.greeting}>{user?.name?.split(' ')[0]} <Ionicons name="hand-left" size={24} color="#fcd34d" /></Text>
-            <Text style={styles.subtitle}>Mari buat perubahan untuk hari ini !</Text>
+            <Text style={styles.greetingSmall}>Selamat Datang,</Text>
+            <Text style={styles.greeting}>{user?.name?.split(' ')[0]} <Ionicons name="sparkles" size={20} color="#FBBF24" /></Text>
+            <Text style={styles.subtitle}>Mari buat perubahan hari ini</Text>
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity 
-              style={styles.notificationBtn} 
-              activeOpacity={0.7}
-              onPress={() => navigation.navigate('Notification')}
-            >
-              <Ionicons name="notifications-outline" size={26} color="#ffffff" />
-              <View style={styles.notificationBadge} />
-            </TouchableOpacity>
+            <BlurView intensity={30} tint="light" style={styles.notificationBtnWrapper}>
+              <TouchableOpacity 
+                style={styles.notificationBtn} 
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('Notification')}
+              >
+                <Ionicons name="notifications-outline" size={24} color="#ffffff" />
+                <View style={styles.notificationBadge} />
+              </TouchableOpacity>
+            </BlurView>
             <TouchableOpacity 
               style={styles.avatarMini}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
               onPress={() => navigation.navigate('Profil')}
             >
-              <Text style={styles.avatarMiniText}>{user?.name?.charAt(0).toUpperCase()}</Text>
+              <LinearGradient colors={['#FBBF24', '#F59E0B']} style={styles.avatarGradient}>
+                <Text style={styles.avatarMiniText}>{user?.name?.charAt(0).toUpperCase()}</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Stat Banner */}
-        <View style={styles.statRow}>
-          <View style={styles.statBox}>
-            <Text style={styles.statNum}>{activities.length}</Text>
-            <Text style={styles.statLabel}>Kegiatan</Text>
+        {/* Stat Banner with Glassmorphism */}
+        <BlurView intensity={40} tint="light" style={styles.statRowWrapper}>
+          <View style={styles.statRow}>
+            <View style={styles.statBox}>
+              <Text style={styles.statNum}>{activities.length}</Text>
+              <Text style={styles.statLabel}>Kegiatan</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statBox}>
+              <Text style={styles.statNum}>
+                {activities.reduce((sum, a) => sum + (a._count?.volunteers || 0), 0)}
+              </Text>
+              <Text style={styles.statLabel}>Relawan</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statBox}>
+              <Text style={styles.statNum}>{user?.role === 'ADMIN' ? 'Admin' : 'User'}</Text>
+              <Text style={styles.statLabel}>Akses</Text>
+            </View>
           </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statBox}>
-            <Text style={styles.statNum}>
-              {activities.reduce((sum, a) => sum + (a._count?.volunteers || 0), 0)}
-            </Text>
-            <Text style={styles.statLabel}>Relawan</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statBox}>
-            <Text style={styles.statNum}>{user?.role === 'ADMIN' ? 'Admin' : 'User'}</Text>
-            <Text style={styles.statLabel}>Peran Anda</Text>
-          </View>
-        </View>
+        </BlurView>
       </LinearGradient>
 
       <View style={styles.searchContainer}>
@@ -229,79 +240,102 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
     borderBottomLeftRadius: 36,
     borderBottomRightRadius: 36,
-    shadowColor: '#059669',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
+    shadowColor: '#064e3b',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 15,
     elevation: 10,
+    overflow: 'hidden',
+  },
+  decorativeCircle: {
+    position: 'absolute',
+    top: -50,
+    right: -20,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 24,
+    marginBottom: 28,
   },
   greetingSmall: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
-    color: '#d1fae5',
+    color: '#a7f3d0',
+    marginBottom: 4,
   },
   greeting: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 28,
+    fontSize: 26,
     color: '#ffffff',
     letterSpacing: -0.5,
   },
   subtitle: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
-    color: '#a7f3d0',
+    color: '#d1fae5',
     marginTop: 4,
+    opacity: 0.9,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
+  },
+  notificationBtnWrapper: {
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   notificationBtn: {
-    padding: 6,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    padding: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   notificationBadge: {
     position: 'absolute',
-    top: 6,
-    right: 6,
+    top: 8,
+    right: 8,
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: '#ef4444',
+    borderWidth: 1.5,
+    borderColor: '#064e3b',
   },
   avatarMini: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#ffffff',
+    shadowColor: '#FBBF24',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  avatarGradient: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   avatarMiniText: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 20,
-    color: '#059669',
+    fontSize: 18,
+    color: '#78350f',
+  },
+  statRowWrapper: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   statRow: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 20,
-    paddingVertical: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    paddingVertical: 18,
     justifyContent: 'space-evenly',
     alignItems: 'center',
   },
@@ -311,20 +345,24 @@ const styles = StyleSheet.create({
   },
   statNum: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
-    fontSize: 20,
+    fontSize: 22,
     color: '#ffffff',
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   statLabel: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 11,
-    color: '#d1fae5',
-    marginTop: 4,
+    color: '#a7f3d0',
+    marginTop: 6,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   statDivider: {
     width: 1,
-    height: 30,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    height: 36,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   searchContainer: {
     flexDirection: 'row',
