@@ -1,0 +1,1 @@
+// Placeholder to wrap App with ErrorBoundary
