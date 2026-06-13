@@ -152,8 +152,6 @@ export default function HomeScreen({ navigation }: any) {
             </TouchableOpacity>
           </View>
         </View>
-
-        </View>
       </LinearGradient>
 
       {/* Overlapping Search Bar */}
